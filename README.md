@@ -35,6 +35,10 @@ GOOGLE_APPLICATION_CREDENTIALS=path/to/key.json npm run set-admin -- someone@gma
 
 ## Deploy
 
-- **Web:** connect the repo to Cloudflare Pages with root directory `web`, build command
-  `npm run build`, output `dist`, and the `VITE_*` env vars from `.env.example`.
+- **Web:** Cloudflare Pages project connected to this repo (every push to `main` deploys, other
+  branches get preview URLs):
+  - Framework preset: none · Root directory: `web` · Build command: `npm run build` · Output: `dist`
+  - Node version comes from `web/.nvmrc` (20.19.0)
+  - While the site runs on the demo data layer no env vars are needed; once Firebase is connected,
+    add the `VITE_*` vars from `.env.example`.
 - **Backend:** `firebase use <project>` then `firebase deploy --only functions,firestore,storage`.
