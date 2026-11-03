@@ -13,3 +13,4 @@ ui-debug.log*
 service-account*.json
 *.tsbuildinfo
 .claude/
+.scratch/

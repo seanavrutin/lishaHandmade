@@ -1,7 +1,8 @@
 // Shared data model for the web app and Cloud Functions.
 // Timestamps are typed generically so both the client SDK and firebase-admin fit.
 
-export type Category = 'quiche' | 'sweet';
+/** Category name as customers see it, e.g. "קישים". Free text, created in the admin. */
+export type Category = string;
 
 export type PaymentMethod = 'paybox' | 'pickup';
 export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
@@ -78,6 +79,16 @@ export interface Order<T = unknown> {
   paymentStatus: PaymentStatus;
   status: OrderStatus;
   createdAt: T;
+}
+
+export interface SiteSettings {
+  aboutText: string;
+  phone: string;
+  payboxLink: string;
+  pickupAddress: string;
+  instagram: string;
+  /** Site colour theme – one of the theme names in web/src/lib/theme.ts. */
+  theme: string;
 }
 
 /** Payload sent by the client to the createOrder function. Prices are recomputed on the server. */

@@ -1,25 +1,217 @@
 @import 'tailwindcss';
 
-/* Brand tokens – placeholder palette (cream / blush / chocolate) until Lior picks final colours. */
-@theme {
-  --color-cream: #f7efe6;
-  --color-cream-dark: #efe2d3;
-  --color-blush: #e9b8b4;
-  --color-blush-dark: #d48f8a;
-  --color-cocoa: #5a3a2e;
-  --color-cocoa-light: #8a6656;
+/*
+ * Colours and fonts are theme roles. Utilities (bg-page, text-ink, bg-primary…) point at the
+ * variables below, so a theme is just a different set of values on <html data-theme="…">.
+ */
+@theme inline {
+  --color-page: var(--t-page);
+  --color-surface: var(--t-surface);
+  --color-line: var(--t-line);
+  --color-ink: var(--t-ink);
+  --color-muted: var(--t-muted);
+  --color-primary: var(--t-primary);
+  --color-on-primary: var(--t-on-primary);
+  --color-accent: var(--t-accent);
+  --color-accent-strong: var(--t-accent-strong);
 
   --font-sans: 'Assistant', system-ui, sans-serif;
-  --font-display: 'Secular One', 'Assistant', sans-serif;
+  --font-display: var(--t-display-font);
+}
+
+/* שוקולד וקרם */
+:root,
+[data-theme='cocoa'] {
+  --t-page: #f7efe6;
+  --t-surface: #ffffff;
+  --t-line: #efe2d3;
+  --t-ink: #5a3a2e;
+  --t-muted: #8a6656;
+  --t-primary: #5a3a2e;
+  --t-on-primary: #f7efe6;
+  --t-accent: #e9b8b4;
+  --t-accent-strong: #c46f68;
+  --t-display-font: 'Secular One', 'Assistant', sans-serif;
+}
+
+/* ורוד פודרה */
+[data-theme='blush'] {
+  --t-page: #fff6f7;
+  --t-surface: #ffffff;
+  --t-line: #f4dde2;
+  --t-ink: #3b2a2f;
+  --t-muted: #8c6e76;
+  --t-primary: #b9476d;
+  --t-on-primary: #ffffff;
+  --t-accent: #f9d3dc;
+  --t-accent-strong: #b9476d;
+  --t-display-font: 'Frank Ruhl Libre', serif;
+}
+
+/* ירוק מרווה */
+[data-theme='sage'] {
+  --t-page: #f3f4ee;
+  --t-surface: #ffffff;
+  --t-line: #dfe4d4;
+  --t-ink: #26311f;
+  --t-muted: #687360;
+  --t-primary: #4d6a39;
+  --t-on-primary: #ffffff;
+  --t-accent: #d9e4c6;
+  --t-accent-strong: #a0702a;
+  --t-display-font: 'Suez One', serif;
+}
+
+/* טרקוטה */
+[data-theme='terracotta'] {
+  --t-page: #fbf4ee;
+  --t-surface: #fffdfa;
+  --t-line: #f0dccb;
+  --t-ink: #3b2418;
+  --t-muted: #8b6a58;
+  --t-primary: #b4512d;
+  --t-on-primary: #ffffff;
+  --t-accent: #f6d0b5;
+  --t-accent-strong: #b4512d;
+  --t-display-font: 'Amatic SC', 'Assistant', sans-serif;
+}
+
+/* תכלת שמיים */
+[data-theme='sky'] {
+  --t-page: #f1f7fb;
+  --t-surface: #ffffff;
+  --t-line: #d5e6f1;
+  --t-ink: #1e3346;
+  --t-muted: #5e778c;
+  --t-primary: #3478a3;
+  --t-on-primary: #ffffff;
+  --t-accent: #cde5f4;
+  --t-accent-strong: #2c6b93;
+  --t-display-font: 'Secular One', 'Assistant', sans-serif;
+}
+
+/* תכלת ואפרסק */
+[data-theme='powder'] {
+  --t-page: #f5f9fc;
+  --t-surface: #ffffff;
+  --t-line: #dde9f2;
+  --t-ink: #2a3a4b;
+  --t-muted: #6c7f91;
+  --t-primary: #5a8fbb;
+  --t-on-primary: #ffffff;
+  --t-accent: #fde0cf;
+  --t-accent-strong: #d9805a;
+  --t-display-font: 'Frank Ruhl Libre', serif;
+}
+
+/* שחור וזהב */
+[data-theme='noir'] {
+  --t-page: #141110;
+  --t-surface: #1f1b19;
+  --t-line: #39312c;
+  --t-ink: #f3e9dd;
+  --t-muted: #b4a597;
+  --t-primary: #d8a85a;
+  --t-on-primary: #1a1410;
+  --t-accent: #4a3a2b;
+  --t-accent-strong: #d8a85a;
+  --t-display-font: 'Frank Ruhl Libre', serif;
+  color-scheme: dark;
 }
 
 html {
-  background-color: var(--color-cream);
-  color: var(--color-cocoa);
+  background-color: var(--t-page);
+  color: var(--t-ink);
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: 'Assistant', system-ui, sans-serif;
   min-height: 100dvh;
+}
+
+/* Amatic SC is a narrow hand-drawn face – it needs to be larger to read well. */
+[data-theme='terracotta'] .font-display {
+  font-weight: 700;
+  font-size-adjust: 0.62;
+  letter-spacing: 0.01em;
+}
+
+/* Hero portrait (photo + arch) fades into the page at the bottom. */
+.hero-fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nudge-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.animate-from-right {
+  animation: slide-in-right 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-from-left {
+  animation: slide-in-left 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-nudge {
+  animation: nudge-down 1.6s ease-in-out infinite;
+}
+
+/* Scroll reveal: .reveal starts hidden, .is-visible is added when it enters the viewport. */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-from-right,
+  .animate-from-left,
+  .animate-nudge {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

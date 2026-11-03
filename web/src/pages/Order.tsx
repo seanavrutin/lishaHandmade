@@ -1,44 +1,66 @@
+import { Link } from 'react-router';
+import { cartSummary, useCart } from '../cart/cart';
+import ProductPicker from '../components/ProductPicker';
+import SaleCountdown from '../components/SaleCountdown';
+import { Card, Loading, buttonClass } from '../components/ui';
+import { api } from '../data';
+import { useApiData } from '../data/hooks';
 import { formatDateTime, formatPrice } from '../lib/format';
-import { useOpenSale } from '../lib/useOpenSale';
 
-// Phase 1 TODO: steppers per item/add-on, sticky cart bar, checkout form → createOrder.
 export default function Order() {
-  const { loading, sale } = useOpenSale();
+  const { data: sale, loading } = useApiData(() => api.getOpenSale(), []);
+  const cart = useCart();
 
-  if (loading) return <p className="py-10 text-center">טוען…</p>;
+  if (loading) return <Loading />;
 
   if (!sale) {
     return (
       <div className="py-16 text-center">
         <h1 className="font-display text-2xl">אין כרגע הזמנות פתוחות</h1>
-        <p className="mt-2 text-cocoa-light">עקבו אחריי בוואטסאפ כדי לשמוע על המכירה הבאה 💕</p>
+        <p className="mt-2 text-muted">המכירה הבאה תיפתח בקרוב 💕</p>
+        <Link to="/" className={buttonClass('secondary', 'mt-6')}>
+          חזרה לדף הבית
+        </Link>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6 py-8">
-      <header>
-        <h1 className="font-display text-3xl">{sale.title}</h1>
-        <p className="mt-1">הזמנות אחרונות עד {formatDateTime(sale.closesAt.toDate())}</p>
-        <p className="text-sm text-cocoa-light">איסוף: {sale.pickupText}</p>
-      </header>
+  const lines = cart.saleId === sale.id ? cart.lines : [];
+  const { count, total } = cartSummary(sale, lines);
 
-      <ul className="space-y-3">
-        {[...sale.items]
-          .sort((a, b) => a.sort - b.sort)
-          .map((item) => (
-            <li key={item.productId} className="rounded-2xl bg-white/70 p-4 shadow-sm">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="font-semibold">{item.name}</span>
-                <span>{formatPrice(item.price)}</span>
-              </div>
-              {item.description && (
-                <p className="mt-1 text-sm text-cocoa-light">{item.description}</p>
-              )}
-            </li>
-          ))}
-      </ul>
+  return (
+    <div className="space-y-6 pb-28 pt-6">
+      <Card className="space-y-2">
+        <SaleCountdown closesAt={sale.closesAt} />
+        <h1 className="font-display text-3xl">{sale.title}</h1>
+        <p className="text-sm">
+          הזמנות אחרונות עד <strong>{formatDateTime(sale.closesAt)}</strong>
+          <br />
+          איסוף: <strong>{sale.pickupText}</strong>
+          {sale.location && <> · {sale.location}</>}
+        </p>
+      </Card>
+
+      <ProductPicker
+        sale={sale}
+        tabs
+        linesFor={(pid) => (cart.saleId === sale.id ? cart.linesFor(pid) : [])}
+        setLines={(pid, lines) => cart.setProductLines(sale.id, pid, lines)}
+      />
+
+      {count > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-page/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+          <Link
+            to="/checkout"
+            className="mx-auto flex max-w-3xl items-center justify-between rounded-full bg-primary px-5 py-3.5 text-on-primary shadow-lg"
+          >
+            <span className="text-sm">
+              {count} פריטים · <strong className="text-base">{formatPrice(total)}</strong>
+            </span>
+            <span className="font-semibold">להמשך ←</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
