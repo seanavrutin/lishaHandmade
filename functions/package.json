@@ -3,12 +3,11 @@
   "private": true,
   "main": "lib/functions/src/index.js",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "scripts": {
     "build": "tsc",
-    "build:watch": "tsc --watch",
-    "set-admin": "node lib/functions/src/scripts/setAdmin.js"
+    "build:watch": "tsc --watch"
   },
   "dependencies": {
     "firebase-admin": "^13.10.0",

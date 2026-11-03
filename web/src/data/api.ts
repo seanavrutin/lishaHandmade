@@ -38,6 +38,8 @@ export interface DataApi {
 
   // Admin auth
   getAdmin(): AdminUser | null;
+  /** Email of whoever is signed in, admin or not – to explain "this account has no access". */
+  getSignedInEmail(): string | null;
   signIn(): Promise<void>;
   signOut(): Promise<void>;
 
@@ -55,4 +57,6 @@ export interface DataApi {
   updateOrder(id: string, patch: OrderPatch): Promise<void>;
   createManualOrder(req: CreateOrderRequest): Promise<CreateOrderResponse>;
   resetDemo(): Promise<void>;
+  /** Fills an empty site with the starting menu, settings and a draft weekend sale. */
+  seedStarterData(): Promise<void>;
 }

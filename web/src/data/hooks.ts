@@ -30,6 +30,11 @@ export function useAdmin() {
   return email ? api.getAdmin() : null;
 }
 
+/** Email of whoever is signed in (admin or not). */
+export function useSignedInEmail() {
+  return useSyncExternalStore(api.subscribe, () => api.getSignedInEmail());
+}
+
 /** Re-renders every `intervalMs` – for countdowns. */
 export function useNow(intervalMs = 30_000) {
   const [now, setNow] = useState(Date.now);

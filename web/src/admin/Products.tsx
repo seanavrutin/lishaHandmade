@@ -1,12 +1,23 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { Loading, ProductImage, buttonClass } from '../components/ui';
+import { Button, Card, Loading, ProductImage, buttonClass } from '../components/ui';
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
 import { formatPrice } from '../lib/format';
 
 export default function Products() {
   const { data: products, loading } = useApiData(() => api.listProducts(), []);
+  const [seeding, setSeeding] = useState(false);
   if (loading) return <Loading />;
+
+  async function seed() {
+    setSeeding(true);
+    try {
+      await api.seedStarterData();
+    } finally {
+      setSeeding(false);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -19,6 +30,18 @@ export default function Products() {
       <p className="text-sm text-muted">
         הקטלוג הקבוע. בכל מכירה בוחרים אילו מוצרים להציע. שינוי כאן לא משנה מכירה שכבר פורסמה.
       </p>
+
+      {products?.length === 0 && (
+        <Card className="space-y-2 text-center">
+          <p className="font-semibold">הקטלוג ריק</p>
+          <p className="text-sm text-muted">
+            אפשר להתחיל מהתפריט הנוכחי (הקישים, עוגת השמרים והסינבונים) ומכירת סופ״ש כטיוטה, ולערוך משם.
+          </p>
+          <Button onClick={seed} disabled={seeding}>
+            {seeding ? 'מייבא…' : 'ייבוא התפריט ההתחלתי'}
+          </Button>
+        </Card>
+      )}
 
       <ul className="space-y-2">
         {(products ?? []).map((p) => (

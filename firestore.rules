@@ -2,8 +2,21 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Admins are listed in /admins/{email} (lower-case email as the document id).
+    function signedInEmail() {
+      return request.auth != null && request.auth.token.email_verified == true
+        ? request.auth.token.email.lower()
+        : '';
+    }
+
     function isAdmin() {
-      return request.auth != null && request.auth.token.admin == true;
+      return signedInEmail() != '' && exists(/databases/$(database)/documents/admins/$(signedInEmail()));
+    }
+
+    match /admins/{email} {
+      // A signed-in user may check their own entry; only admins can add or remove admins.
+      allow read: if email == signedInEmail() || isAdmin();
+      allow write: if isAdmin();
     }
 
     match /products/{productId} {

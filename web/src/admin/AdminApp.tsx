@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Link, NavLink, Route, Routes } from 'react-router';
 import DemoBanner from '../components/DemoBanner';
 import { Button } from '../components/ui';
 import { api } from '../data';
-import { useAdmin } from '../data/hooks';
+import { useAdmin, useSignedInEmail } from '../data/hooks';
 import Dashboard from './Dashboard';
 import ManualOrder from './ManualOrder';
 import Orders from './Orders';
@@ -22,6 +23,18 @@ const TABS = [
 
 export default function AdminApp() {
   const admin = useAdmin();
+  const signedInEmail = useSignedInEmail();
+  const [signInError, setSignInError] = useState('');
+
+  const signIn = async () => {
+    setSignInError('');
+    try {
+      await api.signIn();
+    } catch (err) {
+      const code = (err as { code?: string }).code ?? '';
+      if (!code.includes('popup-closed') && !code.includes('cancelled-popup')) setSignInError('הכניסה נכשלה, נסו שוב');
+    }
+  };
 
   if (!admin) {
     return (
@@ -29,9 +42,21 @@ export default function AdminApp() {
         <DemoBanner />
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
           <h1 className="font-display text-3xl">ניהול Lisha Handmade</h1>
-          <Button onClick={() => api.signIn()} className="px-8 py-3">
-            {api.isDemo ? 'כניסה (מצב הדגמה)' : 'כניסה עם Google'}
-          </Button>
+          {signedInEmail ? (
+            <>
+              <p>
+                לחשבון <strong dir="ltr">{signedInEmail}</strong> אין הרשאת ניהול.
+              </p>
+              <Button variant="secondary" onClick={() => api.signOut()}>
+                התנתקות וכניסה עם חשבון אחר
+              </Button>
+            </>
+          ) : (
+            <Button onClick={signIn} className="px-8 py-3">
+              {api.isDemo ? 'כניסה (מצב הדגמה)' : 'כניסה עם Google'}
+            </Button>
+          )}
+          {signInError && <p className="text-sm text-red-700">{signInError}</p>}
           {api.isDemo && <p className="text-sm text-muted">באתר האמיתי הכניסה תהיה עם חשבון Google של ליאור בלבד</p>}
           <Link to="/" className="text-sm underline">
             חזרה לאתר

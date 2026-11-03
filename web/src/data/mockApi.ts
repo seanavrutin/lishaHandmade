@@ -129,6 +129,10 @@ export const mockApi: DataApi = {
     }
   },
 
+  getSignedInEmail() {
+    return mockApi.getAdmin()?.email ?? null;
+  },
+
   async signIn() {
     localStorage.setItem(ADMIN_KEY, '1');
     listeners.forEach((l) => l());
@@ -230,6 +234,11 @@ export const mockApi: DataApi = {
   },
 
   async resetDemo() {
+    db = seed();
+    commit();
+  },
+
+  async seedStarterData() {
     db = seed();
     commit();
   },
