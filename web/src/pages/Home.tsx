@@ -27,8 +27,8 @@ export default function Home() {
               <img
                 src="/images/lior.webp"
                 alt="ליאור מחזיקה קיש טרי"
-                width={369}
-                height={927}
+                width={721}
+                height={1810}
                 className="absolute left-1/2 top-[3%] w-[70%] -translate-x-1/2"
                 fetchPriority="high"
               />
