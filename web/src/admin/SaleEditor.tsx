@@ -316,7 +316,7 @@ export default function SaleEditor() {
                       <span className="text-accent-strong" aria-hidden="true">
                         ★
                       </span>
-                      מיוחד – יופיע גם בלשונית ״מיוחדים״
+                      ספיישל – יופיע גם בלשונית ״ספיישלים״
                     </label>
                   </div>
                 )}

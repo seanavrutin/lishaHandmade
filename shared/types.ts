@@ -38,7 +38,7 @@ export interface SaleItem {
   addons: Addon[];
   maxQty: number | null; // null = unlimited
   sort: number;
-  /** Shown in the "מיוחדים" tab as well as in its own category. */
+  /** Shown in the "ספיישלים" tab as well as in its own category. */
   special?: boolean;
 }
 

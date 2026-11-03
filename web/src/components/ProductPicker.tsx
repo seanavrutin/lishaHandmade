@@ -18,7 +18,7 @@ interface Props {
 
 /** Section key for items marked "special" in the event; they also stay in their own category. */
 const SPECIALS = '__specials__';
-const sectionTitle = (key: string) => (key === SPECIALS ? '★ מיוחדים ★' : key);
+const sectionTitle = (key: string) => (key === SPECIALS ? '★ ספיישלים ★' : key);
 
 /** Product cards grouped by category, with optional sticky category tabs that follow the scroll. */
 export default function ProductPicker({ sale, linesFor, setLines, ignoreStock, tabs, tabsTop = 'top-14' }: Props) {
@@ -136,7 +136,7 @@ function ProductCard({
             {item.name}
             {specialBadge && (
               <span className="mr-1.5 inline-block whitespace-nowrap rounded-full bg-accent/60 px-2 py-0.5 align-middle text-[11px] font-semibold text-accent-strong">
-                ★ מיוחד
+                ★ ספיישל
               </span>
             )}
           </h3>
