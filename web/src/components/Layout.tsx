@@ -3,6 +3,7 @@ import { api } from '../data';
 import { useApiData } from '../data/hooks';
 import { whatsappLink } from '../lib/format';
 import DemoBanner from './DemoBanner';
+import Logo from './Logo';
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -28,8 +29,8 @@ export default function Layout() {
             <HomeIcon className="h-5 w-5" />
             בית
           </NavLink>
-          <Link to="/" className="font-display text-lg text-ink sm:text-xl">
-            Lisha Handmade
+          <Link to="/" aria-label="Lisha Handmade – דף הבית">
+            <Logo size={1.05} />
           </Link>
           <div className="flex justify-end">
             {pathname !== '/order' && (
