@@ -26,7 +26,7 @@ export default function Orders() {
   const { data: orders } = useApiData(() => (sale ? api.listOrders(sale.id) : Promise.resolve([])), [sale?.id]);
 
   if (loading) return <Loading />;
-  if (!sale) return <Card>עוד אין מכירות.</Card>;
+  if (!sale) return <Card>עוד אין אירועים.</Card>;
 
   const q = search.trim();
   const shown = (orders ?? [])
@@ -158,7 +158,7 @@ function OrderCard({ order }: { order: OrderData }) {
           className="mr-auto text-muted underline"
           onClick={() => {
             if (cancelled) update({ status: 'new' });
-            else if (confirm(`לבטל את הזמנה #${order.orderNo}? המלאי יוחזר למכירה.`)) update({ status: 'cancelled' });
+            else if (confirm(`לבטל את הזמנה #${order.orderNo}? המלאי יוחזר לאירוע.`)) update({ status: 'cancelled' });
           }}
         >
           {cancelled ? 'שחזור הזמנה' : 'ביטול'}

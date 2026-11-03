@@ -26,7 +26,7 @@ export function normalizeOrderRequest(data: CreateOrderRequest): CreateOrderRequ
   const phone = normalizePhone(String(data?.customer?.phone ?? ''));
 
   if (typeof data?.saleId !== 'string' || !data.saleId) {
-    throw new OrderError('invalid-argument', 'חסרה מכירה');
+    throw new OrderError('invalid-argument', 'חסר אירוע');
   }
   if (name.length < 2 || name.length > 80) throw new OrderError('invalid-argument', 'נא למלא שם מלא');
   if (!isValidIsraeliMobile(phone)) throw new OrderError('invalid-argument', 'מספר טלפון לא תקין');
@@ -58,9 +58,9 @@ export function normalizeOrderRequest(data: CreateOrderRequest): CreateOrderRequ
 /** Throws unless the sale is open at `now`. All times in epoch milliseconds. */
 export function assertSaleOpen(status: Sale['status'], now: number, opensAt: number, closesAt: number) {
   if (status !== 'open' || now < opensAt) {
-    throw new OrderError('failed-precondition', 'המכירה אינה פתוחה כרגע');
+    throw new OrderError('failed-precondition', 'ההזמנות לאירוע זה אינן פתוחות כרגע');
   }
-  if (now >= closesAt) throw new OrderError('failed-precondition', 'ההזמנות למכירה זו נסגרו');
+  if (now >= closesAt) throw new OrderError('failed-precondition', 'ההזמנות לאירוע זה נסגרו');
 }
 
 /**
@@ -74,7 +74,7 @@ export function priceOrder(
 ) {
   if (enforceLimits) {
     if (sale.maxOrders != null && sale.orderCount >= sale.maxOrders) {
-      throw new OrderError('resource-exhausted', 'כל ההזמנות למכירה זו נתפסו');
+      throw new OrderError('resource-exhausted', 'כל ההזמנות לאירוע זה נתפסו');
     }
     if (!sale.paymentModes.includes(req.paymentMethod)) {
       throw new OrderError('invalid-argument', 'אמצעי התשלום אינו זמין');
@@ -86,7 +86,7 @@ export function priceOrder(
 
   for (const line of req.items) {
     const saleItem = sale.items.find((i) => i.productId === line.productId);
-    if (!saleItem) throw new OrderError('invalid-argument', 'מוצר לא זמין במכירה');
+    if (!saleItem) throw new OrderError('invalid-argument', 'מוצר לא זמין באירוע');
 
     const addons = line.addonIds.map((id) => {
       const addon = saleItem.addons.find((a) => a.id === id);

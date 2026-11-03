@@ -17,7 +17,7 @@ export default function Order() {
     return (
       <div className="py-16 text-center">
         <h1 className="font-display text-2xl">אין כרגע הזמנות פתוחות</h1>
-        <p className="mt-2 text-muted">המכירה הבאה תיפתח בקרוב 💕</p>
+        <p className="mt-2 text-muted">האירוע הבא ייפתח בקרוב 💕</p>
         <Link to="/" className={buttonClass('secondary', 'mt-6')}>
           חזרה לדף הבית
         </Link>

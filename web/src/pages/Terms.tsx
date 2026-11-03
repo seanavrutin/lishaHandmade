@@ -7,7 +7,7 @@ export default function Terms() {
 
       <section>
         <h2 className="font-semibold">הזמנות</h2>
-        <p>ההזמנות מתקבלות עד מועד הסגירה של כל מכירה, כפי שמופיע באתר, ובכפוף למלאי.</p>
+        <p>ההזמנות מתקבלות עד מועד הסגירה של כל אירוע, כפי שמופיע באתר, ובכפוף למלאי.</p>
       </section>
       <section>
         <h2 className="font-semibold">תשלום</h2>

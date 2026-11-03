@@ -15,18 +15,18 @@ export default function Sales() {
     const source = sales?.find((s) => s.id === id);
     if (!source) return;
     const copy = await api.saveSale(duplicateSale(source));
-    navigate(`/admin/sales/${copy.id}`);
+    navigate(`/admin/events/${copy.id}`);
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl">מכירות</h1>
-        <Link to="/admin/sales/new" className={buttonClass('primary', 'text-sm')}>
-          + מכירה חדשה
+        <h1 className="font-display text-2xl">אירועים</h1>
+        <Link to="/admin/events/new" className={buttonClass('primary', 'text-sm')}>
+          + אירוע חדש
         </Link>
       </div>
-      <p className="text-sm text-muted">טיפ: ״שכפול״ יוצר את אותה מכירה לשבוע הבא, עם כל התאריכים מוזזים בשבוע.</p>
+      <p className="text-sm text-muted">טיפ: ״שכפול״ יוצר את אותו אירוע לשבוע הבא, עם כל התאריכים מוזזים בשבוע.</p>
 
       <ul className="space-y-3">
         {(sales ?? []).map((s) => {
@@ -38,7 +38,7 @@ export default function Sales() {
                   <div>
                     <p className="font-semibold">{s.title}</p>
                     <p className="text-xs text-muted">
-                      נסגרת {formatShortDateTime(s.closesAt)} · איסוף {formatShortDateTime(s.pickupAt)} · {s.orderCount} הזמנות
+                      נסגר {formatShortDateTime(s.closesAt)} · איסוף {formatShortDateTime(s.pickupAt)} · {s.orderCount} הזמנות
                     </p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${SALE_STATUS[state].className}`}>
@@ -46,7 +46,7 @@ export default function Sales() {
                   </span>
                 </div>
                 <div className="flex gap-2">
-                  <Link to={`/admin/sales/${s.id}`} className={buttonClass('secondary', 'flex-1 py-2 text-sm')}>
+                  <Link to={`/admin/events/${s.id}`} className={buttonClass('secondary', 'flex-1 py-2 text-sm')}>
                     עריכה
                   </Link>
                   <button type="button" onClick={() => duplicate(s.id)} className={buttonClass('secondary', 'flex-1 py-2 text-sm')}>

@@ -26,7 +26,7 @@ export default function Settings() {
   }
 
   async function reset() {
-    if (!confirm('לאפס את כל נתוני ההדגמה (מוצרים, מכירות, הזמנות) לברירת המחדל?')) return;
+    if (!confirm('לאפס את כל נתוני ההדגמה (מוצרים, אירועים, הזמנות) לברירת המחדל?')) return;
     await api.resetDemo();
     setSettings(await api.getSettings());
   }
@@ -54,7 +54,7 @@ export default function Settings() {
         <Field label="קישור PayBox לעסקים">
           <input className={inputClass} dir="ltr" value={settings.payboxLink} onChange={(e) => set('payboxLink', e.target.value)} />
         </Field>
-        <Field label="כתובת איסוף (ברירת מחדל למכירות חדשות)">
+        <Field label="כתובת איסוף (ברירת מחדל לאירועים חדשים)">
           <input className={inputClass} value={settings.pickupAddress} onChange={(e) => set('pickupAddress', e.target.value)} />
         </Field>
         <Field label="קישור לאינסטגרם">

@@ -38,6 +38,8 @@ export interface SaleItem {
   addons: Addon[];
   maxQty: number | null; // null = unlimited
   sort: number;
+  /** Shown in the "מיוחדים" tab as well as in its own category. */
+  special?: boolean;
 }
 
 export interface Sale<T = unknown> {

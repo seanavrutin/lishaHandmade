@@ -23,7 +23,7 @@ export default function ManualOrder() {
   const [saving, setSaving] = useState(false);
 
   if (loading) return <Loading />;
-  if (!sale) return <Card>עוד אין מכירות.</Card>;
+  if (!sale) return <Card>עוד אין אירועים.</Card>;
 
   const { count, total } = cartSummary(sale, lines);
 

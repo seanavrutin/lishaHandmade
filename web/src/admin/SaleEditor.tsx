@@ -35,6 +35,7 @@ interface ItemDraft {
   included: boolean;
   price: string;
   maxQty: string;
+  special: boolean;
 }
 
 const PAYMENT_OPTIONS: { value: PaymentMethod; label: string }[] = [
@@ -80,9 +81,11 @@ export default function SaleEditor() {
       for (const p of products) {
         const item = sale.items.find((i) => i.productId === p.id);
         next[p.id] = {
-          included: isNew ? p.active : !!item,
+          // New events start empty: Lior ticks what she offers this time.
+          included: !isNew && !!item,
           price: String(item?.price ?? p.basePrice),
           maxQty: item?.maxQty != null ? String(item.maxQty) : '',
+          special: !!item?.special,
         };
       }
       return next;
@@ -96,17 +99,14 @@ export default function SaleEditor() {
     });
   }, [sale, products, isNew]);
 
-  if (notFound) return <Card>המכירה לא נמצאה</Card>;
+  if (notFound) return <Card>האירוע לא נמצא</Card>;
   if (!sale || !products) return <Loading />;
 
   const set = <K extends keyof SaleData>(key: K, value: SaleData[K]) => setSale({ ...sale, [key]: value });
   const setDraft = (pid: string, patch: Partial<ItemDraft>) => setDrafts({ ...drafts, [pid]: { ...drafts[pid], ...patch } });
 
-  // Active catalog products, plus inactive ones already in this sale, in the dragged order.
-  const visibleIds = order.filter((pid) => {
-    const p = products.find((x) => x.id === pid);
-    return p && (p.active || drafts[pid]?.included);
-  });
+  // Every catalog product, in the dragged order.
+  const visibleIds = order.filter((pid) => products.some((x) => x.id === pid));
 
   function buildItems(): SaleItem[] {
     return order
@@ -122,6 +122,7 @@ export default function SaleEditor() {
         addons: p.addons,
         maxQty: drafts[p.id].maxQty === '' ? null : Math.max(0, Math.floor(Number(drafts[p.id].maxQty))),
         sort: index,
+        special: drafts[p.id].special,
       }));
   }
 
@@ -137,7 +138,7 @@ export default function SaleEditor() {
     try {
       const saved = await api.saveSale({ ...sale!, status, items });
       setSale(saved);
-      if (isNew) navigate(`/admin/sales/${saved.id}`, { replace: true });
+      if (isNew) navigate(`/admin/events/${saved.id}`, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בשמירה');
     } finally {
@@ -147,11 +148,11 @@ export default function SaleEditor() {
 
   async function remove() {
     const msg = sale!.orderCount
-      ? `למכירה יש ${sale!.orderCount} הזמנות – הן יימחקו גם כן. למחוק בכל זאת?`
-      : 'למחוק את המכירה?';
+      ? `לאירוע יש ${sale!.orderCount} הזמנות – הן יימחקו גם כן. למחוק בכל זאת?`
+      : 'למחוק את האירוע?';
     if (!confirm(msg)) return;
     await api.deleteSale(sale!.id);
-    navigate('/admin/sales');
+    navigate('/admin/events');
   }
 
   const dateField = (label: string, key: 'opensAt' | 'closesAt' | 'pickupAt') => (
@@ -168,9 +169,9 @@ export default function SaleEditor() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl">{isNew ? 'מכירה חדשה' : 'עריכת מכירה'}</h1>
-        <Link to="/admin/sales" className="text-sm underline">
-          → לכל המכירות
+        <h1 className="font-display text-2xl">{isNew ? 'אירוע חדש' : 'עריכת אירוע'}</h1>
+        <Link to="/admin/events" className="text-sm underline">
+          → לכל האירועים
         </Link>
       </div>
 
@@ -239,7 +240,7 @@ export default function SaleEditor() {
             </label>
           ))}
         </div>
-        <Field label="מקסימום הזמנות למכירה" hint="ריק = ללא הגבלה">
+        <Field label="מקסימום הזמנות לאירוע" hint="ריק = ללא הגבלה">
           <input
             className={inputClass}
             type="number"
@@ -252,9 +253,9 @@ export default function SaleEditor() {
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="font-semibold">מוצרים במכירה</h2>
+        <h2 className="font-semibold">מוצרים באירוע</h2>
         <p className="text-xs text-muted">
-          גוררים את ⋮⋮ כדי לקבוע את סדר ההופעה באתר. אפשר לשנות מחיר למכירה הזו ולהגביל כמות (ריק = ללא הגבלה).
+          גוררים את ⋮⋮ כדי לקבוע את סדר ההופעה באתר. אפשר לשנות מחיר לאירוע הזה ולהגביל כמות (ריק = ללא הגבלה).
         </p>
         <SortableList
           ids={visibleIds}
@@ -301,6 +302,22 @@ export default function SaleEditor() {
                         onChange={(e) => setDraft(p.id, { maxQty: e.target.value })}
                       />
                     </Field>
+                    <label
+                      className={`col-span-2 flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm ring-1 transition ${
+                        d.special ? 'bg-accent/50 font-semibold ring-accent-strong' : 'ring-line'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="h-5 w-5 accent-primary"
+                        checked={d.special}
+                        onChange={(e) => setDraft(p.id, { special: e.target.checked })}
+                      />
+                      <span className="text-accent-strong" aria-hidden="true">
+                        ★
+                      </span>
+                      מיוחד – יופיע גם בלשונית ״מיוחדים״
+                    </label>
                   </div>
                 )}
               </div>
@@ -338,7 +355,7 @@ export default function SaleEditor() {
         )}
         {!isNew && (
           <Button variant="danger" onClick={remove}>
-            מחיקת מכירה
+            מחיקת אירוע
           </Button>
         )}
       </div>

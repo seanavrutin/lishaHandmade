@@ -70,7 +70,7 @@ const newId = () => Math.random().toString(36).slice(2, 10);
 function insertOrder(req: CreateOrderRequest, enforceLimits: boolean) {
   const input = normalizeOrderRequest(req);
   const sale = db.sales.find((s) => s.id === input.saleId);
-  if (!sale) throw new Error('המכירה לא נמצאה');
+  if (!sale) throw new Error('האירוע לא נמצא');
   if (enforceLimits) assertSaleOpen(sale.status, Date.now(), sale.opensAt, sale.closesAt);
 
   const { items, total, qtyByProduct } = priceOrder(sale, input, { enforceLimits });

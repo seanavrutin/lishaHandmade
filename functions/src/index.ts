@@ -35,7 +35,7 @@ export const createOrder = onCall<CreateOrderRequest & { manual?: boolean }>(asy
       const counterRef = db.collection('counters').doc('orders');
       const [saleSnap, counterSnap] = await Promise.all([tx.get(saleRef), tx.get(counterRef)]);
 
-      if (!saleSnap.exists) throw new OrderError('not-found', 'המכירה לא נמצאה');
+      if (!saleSnap.exists) throw new OrderError('not-found', 'האירוע לא נמצא');
       const sale = saleSnap.data() as Sale<Timestamp>;
 
       if (!manual) assertSaleOpen(sale.status, Date.now(), sale.opensAt.toMillis(), sale.closesAt.toMillis());

@@ -78,7 +78,7 @@ export default function ProductEditor() {
   }
 
   async function remove() {
-    if (!confirm(`למחוק את "${product!.name}"? (מכירות קיימות לא ישתנו)`)) return;
+    if (!confirm(`למחוק את "${product!.name}"? (אירועים קיימים לא ישתנו)`)) return;
     await api.deleteProduct(product!.id);
     navigate('/admin/products');
   }
@@ -168,10 +168,6 @@ export default function ProductEditor() {
             />
           </Field>
         </div>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" className="h-5 w-5 accent-primary" checked={product.active} onChange={(e) => set('active', e.target.checked)} />
-          פעיל (מוצע כברירת מחדל במכירות חדשות)
-        </label>
       </Card>
 
       <Card className="space-y-3">

@@ -99,7 +99,7 @@ export default function Home() {
           !loading && (
             <div className="rounded-3xl bg-surface p-6 text-center ring-1 ring-line">
               <h2 className="font-display text-2xl">אין כרגע הזמנות פתוחות</h2>
-              <p className="mt-2 text-muted">המכירה הבאה תיפתח בקרוב – שלחו הודעה כדי לשמוע עליה ראשונים 💕</p>
+              <p className="mt-2 text-muted">האירוע הבא ייפתח בקרוב – שלחו הודעה כדי לשמוע עליה ראשונים 💕</p>
             </div>
           )
         )}

@@ -16,7 +16,7 @@ import Settings from './Settings';
 const TABS = [
   { to: '/admin', label: 'ראשי', icon: '📊', end: true },
   { to: '/admin/orders', label: 'הזמנות', icon: '🧾' },
-  { to: '/admin/sales', label: 'מכירות', icon: '📅' },
+  { to: '/admin/events', label: 'אירועים', icon: '📅' },
   { to: '/admin/products', label: 'מוצרים', icon: '🥧' },
   { to: '/admin/settings', label: 'הגדרות', icon: '⚙️' },
 ];
@@ -88,8 +88,8 @@ export default function AdminApp() {
           <Route index element={<Dashboard />} />
           <Route path="orders" element={<Orders />} />
           <Route path="orders/new" element={<ManualOrder />} />
-          <Route path="sales" element={<Sales />} />
-          <Route path="sales/:id" element={<SaleEditor />} />
+          <Route path="events" element={<Sales />} />
+          <Route path="events/:id" element={<SaleEditor />} />
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductEditor />} />
           <Route path="settings" element={<Settings />} />

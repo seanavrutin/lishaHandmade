@@ -6,8 +6,8 @@ import { formatDateTime } from '../lib/format';
 
 export const SALE_STATUS: Record<SaleStatus, { label: string; className: string }> = {
   draft: { label: 'טיוטה', className: 'bg-line text-ink' },
-  open: { label: 'פתוחה', className: 'bg-green-100 text-green-800' },
-  closed: { label: 'סגורה', className: 'bg-gray-200 text-gray-700' },
+  open: { label: 'פתוח', className: 'bg-green-100 text-green-800' },
+  closed: { label: 'סגור', className: 'bg-gray-200 text-gray-700' },
 };
 
 /** Effective state for display: an "open" sale whose deadline passed shows as closed. */

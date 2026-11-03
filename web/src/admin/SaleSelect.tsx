@@ -13,10 +13,10 @@ export default function SaleSelect({
   onChange: (id: string) => void;
 }) {
   return (
-    <select className={inputClass} value={value} onChange={(e) => onChange(e.target.value)} aria-label="בחירת מכירה">
+    <select className={inputClass} value={value} onChange={(e) => onChange(e.target.value)} aria-label="בחירת אירוע">
       {sales.map((s) => (
         <option key={s.id} value={s.id}>
-          {s.title} · {SALE_STATUS[saleState(s)].label} · נסגרת {formatShortDateTime(s.closesAt)}
+          {s.title} · {SALE_STATUS[saleState(s)].label} · נסגר {formatShortDateTime(s.closesAt)}
         </option>
       ))}
     </select>

@@ -28,14 +28,14 @@ export default function Products() {
         </Link>
       </div>
       <p className="text-sm text-muted">
-        הקטלוג הקבוע. בכל מכירה בוחרים אילו מוצרים להציע. שינוי כאן לא משנה מכירה שכבר פורסמה.
+        הקטלוג הקבוע. בכל אירוע בוחרים אילו מוצרים להציע. שינוי כאן לא משנה אירוע שכבר פורסם.
       </p>
 
       {products?.length === 0 && (
         <Card className="space-y-2 text-center">
           <p className="font-semibold">הקטלוג ריק</p>
           <p className="text-sm text-muted">
-            אפשר להתחיל מהתפריט הנוכחי (הקישים, עוגת השמרים והסינבונים) ומכירת סופ״ש כטיוטה, ולערוך משם.
+            אפשר להתחיל מהתפריט הנוכחי (הקישים, עוגת השמרים והסינבונים) ואירוע סופ״ש כטיוטה, ולערוך משם.
           </p>
           <Button onClick={seed} disabled={seeding}>
             {seeding ? 'מייבא…' : 'ייבוא התפריט ההתחלתי'}
@@ -48,7 +48,7 @@ export default function Products() {
           <li key={p.id}>
             <Link
               to={`/admin/products/${p.id}`}
-              className={`flex items-center gap-3 rounded-2xl bg-surface/80 p-2.5 ring-1 ring-line ${p.active ? '' : 'opacity-50'}`}
+              className="flex items-center gap-3 rounded-2xl bg-surface/80 p-2.5 ring-1 ring-line"
             >
               <ProductImage src={p.imageUrl} category={p.category} className="h-14 w-14 shrink-0 rounded-xl" />
               <div className="min-w-0 flex-1">
@@ -56,7 +56,6 @@ export default function Products() {
                 <p className="text-xs text-muted">
                   {p.category} · {formatPrice(p.basePrice)}
                   {p.addons.length > 0 && ` · ${p.addons.map((a) => a.name).join(', ')}`}
-                  {!p.active && ' · מוסתר'}
                 </p>
               </div>
               <span aria-hidden="true">‹</span>

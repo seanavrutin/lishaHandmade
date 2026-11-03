@@ -17,9 +17,9 @@ export default function Dashboard() {
   if (!sale) {
     return (
       <Card className="text-center">
-        <p>עוד אין מכירות.</p>
-        <Link to="/admin/sales/new" className={buttonClass('primary', 'mt-3')}>
-          פתיחת מכירה ראשונה
+        <p>עוד אין אירועים.</p>
+        <Link to="/admin/events/new" className={buttonClass('primary', 'mt-3')}>
+          פתיחת אירוע ראשון
         </Link>
       </Card>
     );
@@ -45,10 +45,10 @@ export default function Dashboard() {
         <p className="text-sm">
           {state === 'open' ? (
             <>
-              נסגרת בעוד <strong>{formatTimeLeft(sale.closesAt - now)}</strong> ({formatDateTime(sale.closesAt)})
+              נסגר בעוד <strong>{formatTimeLeft(sale.closesAt - now)}</strong> ({formatDateTime(sale.closesAt)})
             </>
           ) : (
-            <>נסגרת/נסגרה: {formatDateTime(sale.closesAt)}</>
+            <>מועד סגירה: {formatDateTime(sale.closesAt)}</>
           )}
           <br />
           איסוף: {sale.pickupText} · {formatDateTime(sale.pickupAt)}
@@ -64,8 +64,8 @@ export default function Dashboard() {
               <WhatsAppIcon className="h-4 w-4" /> שיתוף בוואטסאפ
             </a>
           )}
-          <Link to={`/admin/sales/${sale.id}`} className={buttonClass('secondary', 'text-sm')}>
-            עריכת מכירה
+          <Link to={`/admin/events/${sale.id}`} className={buttonClass('secondary', 'text-sm')}>
+            עריכת אירוע
           </Link>
         </div>
       </Card>
