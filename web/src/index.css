@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* Brand tokens – placeholder palette (cream / blush / chocolate) until Lior picks final colours. */
+@theme {
+  --color-cream: #f7efe6;
+  --color-cream-dark: #efe2d3;
+  --color-blush: #e9b8b4;
+  --color-blush-dark: #d48f8a;
+  --color-cocoa: #5a3a2e;
+  --color-cocoa-light: #8a6656;
+
+  --font-sans: 'Assistant', system-ui, sans-serif;
+  --font-display: 'Secular One', 'Assistant', sans-serif;
+}
+
+html {
+  background-color: var(--color-cream);
+  color: var(--color-cocoa);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}

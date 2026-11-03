@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /products/{productId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Customers see only open sales. `sold` / `orderCount` are also updated by createOrder (admin SDK).
+    match /sales/{saleId} {
+      allow read: if resource.data.status == 'open' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Orders are created only through the createOrder function.
+    match /orders/{orderId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false;
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /counters/{docId} {
+      allow read, write: if false;
+    }
+  }
+}

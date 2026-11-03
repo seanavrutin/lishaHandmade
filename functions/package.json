@@ -1,0 +1,20 @@
+{
+  "name": "lisha-handmade-functions",
+  "private": true,
+  "main": "lib/functions/src/index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "set-admin": "node lib/functions/src/scripts/setAdmin.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.10.0",
+    "firebase-functions": "^6.6.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.8"
+  }
+}
