@@ -16,16 +16,10 @@ interface Props {
   tabsTop?: string;
 }
 
-/** Section key for items marked "special" in the event; they also stay in their own category. */
-const SPECIALS = '__specials__';
-const sectionTitle = (key: string) => (key === SPECIALS ? '★ ספיישלים ★' : key);
-
 /** Product cards grouped by category, with optional sticky category tabs that follow the scroll. */
 export default function ProductPicker({ sale, linesFor, setLines, ignoreStock, tabs, tabsTop = 'top-14' }: Props) {
   const items = [...sale.items].sort((a, b) => a.sort - b.sort);
-  const hasSpecials = !!tabs && items.some((i) => i.special);
-  const categories = [...(hasSpecials ? [SPECIALS] : []), ...new Set(items.map((i) => i.category))] as Category[];
-  const itemsOf = (key: string) => (key === SPECIALS ? items.filter((i) => i.special) : items.filter((i) => i.category === key));
+  const categories = [...new Set(items.map((i) => i.category))] as Category[];
   const [active, setActive] = useState<Category>(categories[0]);
   const sections = useRef(new Map<Category, HTMLElement>());
 
@@ -63,7 +57,7 @@ export default function ProductPicker({ sale, linesFor, setLines, ignoreStock, t
                   active === c ? 'bg-primary text-on-primary shadow' : 'text-muted hover:text-ink'
                 }`}
               >
-                {sectionTitle(c)}
+                {c}
               </button>
             ))}
           </div>
@@ -80,12 +74,14 @@ export default function ProductPicker({ sale, linesFor, setLines, ignoreStock, t
           }}
           className="scroll-mt-32 space-y-3"
         >
-          <h2 className={`font-display text-2xl ${category === SPECIALS ? 'text-accent-strong' : ''}`}>{sectionTitle(category)}</h2>
-          {itemsOf(category).map((item) => (
+          <h2 className="font-display text-2xl">{category}</h2>
+          {items
+            .filter((i) => i.category === category)
+            .map((item) => (
               <ProductCard
                 key={item.productId}
                 item={item}
-                specialBadge={!!item.special && category !== SPECIALS && hasSpecials}
+                specialBadge={!!item.special}
                 lines={linesFor(item.productId)}
                 left={item.maxQty == null || ignoreStock ? null : Math.max(item.maxQty - (sale.sold[item.productId] ?? 0), 0)}
                 onChange={(lines) => setLines(item.productId, lines)}

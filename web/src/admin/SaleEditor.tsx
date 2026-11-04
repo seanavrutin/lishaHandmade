@@ -316,7 +316,7 @@ export default function SaleEditor() {
                       <span className="text-accent-strong" aria-hidden="true">
                         ★
                       </span>
-                      ספיישל – יופיע גם בלשונית ״ספיישלים״
+                      ספיישל – יסומן ב-״★ ספיישל״ באתר
                     </label>
                   </div>
                 )}

@@ -38,7 +38,7 @@ export interface SaleItem {
   addons: Addon[];
   maxQty: number | null; // null = unlimited
   sort: number;
-  /** Shown in the "ספיישלים" tab as well as in its own category. */
+  /** Highlighted with a "★ ספיישל" badge on the order page. */
   special?: boolean;
 }
 
