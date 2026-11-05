@@ -81,6 +81,7 @@ export const seedSettings: SiteSettings = {
   pickupAddress: 'כתובת לדוגמה – תעודכן בהגדרות',
   instagram: '',
   theme: 'cocoa',
+  terms: '',
 };
 
 /** Next occurrence of `weekday` (0 = Sunday) at `hour`:00 local time, strictly in the future. */

@@ -91,6 +91,8 @@ export interface SiteSettings {
   instagram: string;
   /** Site colour theme – one of the theme names in web/src/lib/theme.ts. */
   theme: string;
+  /** Terms page text ("# heading" lines, blank line = new paragraph). Empty = built-in draft. */
+  terms: string;
 }
 
 /** Payload sent by the client to the createOrder function. Prices are recomputed on the server. */

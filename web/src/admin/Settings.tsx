@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import type { SiteSettings } from '@shared/types';
 import { Button, Card, Field, Loading, inputClass } from '../components/ui';
 import { api } from '../data';
+import { DEFAULT_TERMS } from '../lib/terms';
 import { applySiteTheme, type ThemeName } from '../lib/theme';
 import ThemePicker from './ThemePicker';
 
@@ -10,7 +12,8 @@ export default function Settings() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    api.getSettings().then(setSettings);
+    // The terms box starts from the built-in draft until the admin saves her own version.
+    api.getSettings().then((s) => setSettings({ ...s, terms: s.terms?.trim() ? s.terms : DEFAULT_TERMS }));
   }, []);
 
   if (!settings) return <Loading />;
@@ -62,6 +65,26 @@ export default function Settings() {
         </Field>
         <Button onClick={save} className="w-full py-3">
           {saved ? '✓ נשמר' : 'שמירה'}
+        </Button>
+      </Card>
+
+      <Card className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold">תקנון</h2>
+          <Link to="/terms" target="_blank" className="text-sm underline">
+            צפייה בתקנון
+          </Link>
+        </div>
+        <Field label="טקסט התקנון" hint="שורה שמתחילה ב-# היא כותרת. שורה ריקה מתחילה פסקה חדשה.">
+          <textarea
+            className={`${inputClass} leading-relaxed`}
+            rows={16}
+            value={settings.terms}
+            onChange={(e) => set('terms', e.target.value)}
+          />
+        </Field>
+        <Button onClick={save} className="w-full py-3">
+          {saved ? '✓ נשמר' : 'שמירת התקנון'}
         </Button>
       </Card>
 
