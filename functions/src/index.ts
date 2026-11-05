@@ -1,15 +1,20 @@
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { setGlobalOptions } from 'firebase-functions/v2';
+import { setGlobalOptions, logger } from 'firebase-functions/v2';
+import { defineSecret } from 'firebase-functions/params';
 import { assertSaleOpen, normalizeOrderRequest, OrderError, priceOrder } from '../../shared/orderLogic';
-import type { CreateOrderRequest, CreateOrderResponse, Order, Sale } from '../../shared/types';
+import type { CreateOrderRequest, CreateOrderResponse, Order, Sale, SiteSettings } from '../../shared/types';
+import { sendOrderEmail } from './orderEmail';
 
 initializeApp();
 setGlobalOptions({ region: 'europe-west1', maxInstances: 5 });
 
 const db = getFirestore();
 const FIRST_ORDER_NO = 1001;
+
+/** Gmail app password for lisha.handmade@gmail.com – set with `firebase functions:secrets:set GMAIL_APP_PASSWORD`. */
+const gmailAppPassword = defineSecret('GMAIL_APP_PASSWORD');
 
 /** True when the caller is listed in /admins/{email} (same rule as firestore.rules). */
 async function isAdmin(token: { email?: string; email_verified?: boolean } | undefined) {
@@ -21,16 +26,17 @@ async function isAdmin(token: { email?: string; email_verified?: boolean } | und
  * Creates an order inside one transaction: checks the sale is open, recomputes prices from the
  * sale document (client prices are never trusted), enforces stock limits and assigns an order number.
  * `manual: true` (admins only) is for phone orders: allowed after closing and without stock limits.
+ * Afterwards the customer gets an order-summary email; a failed email never fails the order.
  */
-export const createOrder = onCall<CreateOrderRequest & { manual?: boolean }>(async (request): Promise<CreateOrderResponse> => {
+export const createOrder = onCall<CreateOrderRequest & { manual?: boolean }>({ secrets: [gmailAppPassword] }, async (request): Promise<CreateOrderResponse> => {
   try {
-    const input = normalizeOrderRequest(request.data);
     const manual = request.data?.manual === true;
+    const input = normalizeOrderRequest(request.data, { requireEmail: !manual });
     if (manual && !(await isAdmin(request.auth?.token))) {
       throw new HttpsError('permission-denied', 'נדרשת הרשאת ניהול');
     }
 
-    return await db.runTransaction(async (tx) => {
+    const { response, sale, items, total } = await db.runTransaction(async (tx) => {
       const saleRef = db.collection('sales').doc(input.saleId);
       const counterRef = db.collection('counters').doc('orders');
       const [saleSnap, counterSnap] = await Promise.all([tx.get(saleRef), tx.get(counterRef)]);
@@ -66,8 +72,35 @@ export const createOrder = onCall<CreateOrderRequest & { manual?: boolean }>(asy
         ),
       });
 
-      return { orderId: orderRef.id, orderNo, total };
+      return { response: { orderId: orderRef.id, orderNo, total }, sale, items, total };
     });
+
+    if (input.customer.email) {
+      try {
+        const settings = (await db.collection('settings').doc('site').get()).data() as Partial<SiteSettings> | undefined;
+        await sendOrderEmail(
+          {
+            to: input.customer.email,
+            name: input.customer.name,
+            orderNo: response.orderNo,
+            items,
+            total,
+            paymentMethod: input.paymentMethod,
+            saleTitle: sale.title,
+            pickupAt: sale.pickupAt.toMillis(),
+            pickupText: sale.pickupText,
+            location: sale.location,
+            payboxLink: settings?.payboxLink ?? '',
+            phone: settings?.phone ?? '',
+          },
+          gmailAppPassword.value(),
+        );
+      } catch (err) {
+        logger.error('Order email failed', { orderNo: response.orderNo, error: String(err) });
+      }
+    }
+
+    return response;
   } catch (err) {
     if (err instanceof OrderError) throw new HttpsError(err.code, err.message);
     throw err;

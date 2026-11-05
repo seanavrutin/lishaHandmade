@@ -73,7 +73,8 @@ export interface Order<T = unknown> {
   id: string;
   orderNo: number;
   saleId: string;
-  customer: { name: string; phone: string };
+  /** email is required for website orders, optional for orders the admin enters by hand. */
+  customer: { name: string; phone: string; email?: string };
   notes: string;
   items: OrderItem[];
   total: number;
@@ -98,7 +99,8 @@ export interface SiteSettings {
 /** Payload sent by the client to the createOrder function. Prices are recomputed on the server. */
 export interface CreateOrderRequest {
   saleId: string;
-  customer: { name: string; phone: string };
+  /** email is required for website orders, optional for orders the admin enters by hand. */
+  customer: { name: string; phone: string; email?: string };
   notes: string;
   paymentMethod: PaymentMethod;
   items: { productId: string; addonIds: string[]; qty: number }[];

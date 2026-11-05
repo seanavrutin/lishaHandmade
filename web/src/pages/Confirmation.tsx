@@ -56,6 +56,11 @@ export default function Confirmation() {
         <p className="mt-1 text-lg">
           ההזמנה התקבלה · מספר הזמנה <strong>#{order.orderNo}</strong>
         </p>
+        {order.email && !api.isDemo && (
+          <p className="mt-1 text-sm text-muted">
+            סיכום ההזמנה נשלח ל-<span dir="ltr">{order.email}</span> 📧
+          </p>
+        )}
       </div>
 
       {order.paymentMethod === 'paybox' ? (

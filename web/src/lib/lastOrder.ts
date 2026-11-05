@@ -6,6 +6,7 @@ export interface LastOrder {
   orderNo: number;
   total: number;
   name: string;
+  email?: string;
   paymentMethod: PaymentMethod;
   items: Pick<OrderItem, 'name' | 'addonNames' | 'qty' | 'lineTotal'>[];
   saleTitle: string;
@@ -35,17 +36,18 @@ export function loadLastOrder(): LastOrder | null {
 
 const CUSTOMER_KEY = 'lisha-customer';
 
-export function loadCustomer(): { name: string; phone: string } {
+export function loadCustomer(): { name: string; phone: string; email: string } {
+  const empty = { name: '', phone: '', email: '' };
   try {
     const raw = localStorage.getItem(CUSTOMER_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return { ...empty, ...JSON.parse(raw) };
   } catch {
     // ignore
   }
-  return { name: '', phone: '' };
+  return empty;
 }
 
-export function saveCustomer(customer: { name: string; phone: string }) {
+export function saveCustomer(customer: { name: string; phone: string; email: string }) {
   try {
     localStorage.setItem(CUSTOMER_KEY, JSON.stringify(customer));
   } catch {

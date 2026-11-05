@@ -68,7 +68,7 @@ const clone = <T>(v: T): T => (v === undefined ? v : JSON.parse(JSON.stringify(v
 const newId = () => Math.random().toString(36).slice(2, 10);
 
 function insertOrder(req: CreateOrderRequest, enforceLimits: boolean) {
-  const input = normalizeOrderRequest(req);
+  const input = normalizeOrderRequest(req, { requireEmail: enforceLimits });
   const sale = db.sales.find((s) => s.id === input.saleId);
   if (!sale) throw new Error('האירוע לא נמצא');
   if (enforceLimits) assertSaleOpen(sale.status, Date.now(), sale.opensAt, sale.closesAt);

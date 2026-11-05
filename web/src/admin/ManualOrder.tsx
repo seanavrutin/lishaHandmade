@@ -16,6 +16,7 @@ export default function ManualOrder() {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [notes, setNotes] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pickup');
   const [alreadyPaid, setAlreadyPaid] = useState(false);
@@ -33,7 +34,7 @@ export default function ManualOrder() {
     setSaving(true);
     setError('');
     try {
-      const res = await api.createManualOrder({ saleId: sale.id, customer: { name, phone }, notes, paymentMethod, items: lines });
+      const res = await api.createManualOrder({ saleId: sale.id, customer: { name, phone, email }, notes, paymentMethod, items: lines });
       if (alreadyPaid) await api.updateOrder(res.orderId, { paymentStatus: 'paid' });
       navigate(`/admin/orders?sale=${sale.id}`);
     } catch (err) {
@@ -73,6 +74,9 @@ export default function ManualOrder() {
         </Field>
         <Field label="טלפון">
           <input className={inputClass} value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" dir="ltr" required />
+        </Field>
+        <Field label="מייל (לא חובה)" hint="אם ממלאים – הלקוח יקבל סיכום הזמנה במייל">
+          <input className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} type="email" dir="ltr" />
         </Field>
         <Field label="הערות">
           <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} />

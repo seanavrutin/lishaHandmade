@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { isValidIsraeliMobile } from '@shared/orderLogic';
+import { isValidEmail, isValidIsraeliMobile } from '@shared/orderLogic';
 import type { PaymentMethod } from '@shared/types';
 import { cartSummary, useCart } from '../cart/cart';
 import { Button, Card, Field, Loading, buttonClass, inputClass } from '../components/ui';
@@ -46,12 +46,13 @@ export default function Checkout() {
   const paymentMethod = payment ?? sale.paymentModes[0];
   const nameError = customer.name.trim().length < 2 ? 'נא למלא שם מלא' : '';
   const phoneError = !isValidIsraeliMobile(customer.phone) ? 'נא למלא מספר נייד תקין (05X)' : '';
+  const emailError = !isValidEmail(customer.email) ? 'נא למלא כתובת מייל תקינה' : '';
   const agreeError = !agreed ? 'יש לאשר את התקנון' : '';
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     setSubmitted(true);
-    if (nameError || phoneError || agreeError || !sale || !summary) return;
+    if (nameError || phoneError || emailError || agreeError || !sale || !summary) return;
 
     setSending(true);
     setError('');
@@ -69,6 +70,7 @@ export default function Checkout() {
         orderNo: res.orderNo,
         total: res.total,
         name: customer.name,
+        email: customer.email.trim(),
         paymentMethod,
         items: summary.rows.map((r) => ({ name: r.name, addonNames: r.addonNames, qty: r.qty, lineTotal: r.lineTotal })),
         saleTitle: sale.title,
@@ -141,6 +143,20 @@ export default function Checkout() {
             aria-invalid={submitted && !!phoneError}
           />
           {submitted && phoneError && <span className="text-sm text-red-700">{phoneError}</span>}
+        </Field>
+        <Field label="מייל *" hint="נשלח לשם את סיכום ההזמנה">
+          <input
+            className={inputClass}
+            value={customer.email}
+            onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            dir="ltr"
+            placeholder="name@gmail.com"
+            aria-invalid={submitted && !!emailError}
+          />
+          {submitted && emailError && <span className="text-sm text-red-700">{emailError}</span>}
         </Field>
         <Field label="הערות (לא חובה)">
           <textarea className={inputClass} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />

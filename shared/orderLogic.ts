@@ -20,16 +20,26 @@ export const normalizePhone = (phone: string) => phone.replace(/[\s-]/g, '');
 /** Israeli mobile number: 05X-XXXXXXX, with or without dashes / +972. */
 export const isValidIsraeliMobile = (phone: string) => /^(?:\+972|0)5\d{8}$/.test(normalizePhone(phone));
 
-/** Validates and cleans an untrusted order request. */
-export function normalizeOrderRequest(data: CreateOrderRequest): CreateOrderRequest {
+export const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+
+/**
+ * Validates and cleans an untrusted order request.
+ * `requireEmail: false` is for orders the admin enters by hand (phone orders may have no email).
+ */
+export function normalizeOrderRequest(
+  data: CreateOrderRequest,
+  { requireEmail = true }: { requireEmail?: boolean } = {},
+): CreateOrderRequest {
   const name = String(data?.customer?.name ?? '').trim();
   const phone = normalizePhone(String(data?.customer?.phone ?? ''));
+  const email = String(data?.customer?.email ?? '').trim().toLowerCase();
 
   if (typeof data?.saleId !== 'string' || !data.saleId) {
     throw new OrderError('invalid-argument', 'חסר אירוע');
   }
   if (name.length < 2 || name.length > 80) throw new OrderError('invalid-argument', 'נא למלא שם מלא');
   if (!isValidIsraeliMobile(phone)) throw new OrderError('invalid-argument', 'מספר טלפון לא תקין');
+  if ((requireEmail || email) && !isValidEmail(email)) throw new OrderError('invalid-argument', 'כתובת מייל לא תקינה');
   if (!Array.isArray(data.items) || data.items.length === 0 || data.items.length > 30) {
     throw new OrderError('invalid-argument', 'ההזמנה ריקה');
   }
@@ -48,7 +58,7 @@ export function normalizeOrderRequest(data: CreateOrderRequest): CreateOrderRequ
 
   return {
     saleId: data.saleId,
-    customer: { name, phone },
+    customer: email ? { name, phone, email } : { name, phone },
     notes: String(data.notes ?? '').slice(0, 500),
     paymentMethod: data.paymentMethod,
     items,

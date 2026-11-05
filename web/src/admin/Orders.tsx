@@ -31,7 +31,14 @@ export default function Orders() {
   const q = search.trim();
   const shown = (orders ?? [])
     .filter(FILTERS[filter].test)
-    .filter((o) => !q || o.customer.name.includes(q) || o.customer.phone.includes(q) || String(o.orderNo).includes(q));
+    .filter(
+      (o) =>
+        !q ||
+        o.customer.name.includes(q) ||
+        o.customer.phone.includes(q) ||
+        (o.customer.email ?? '').includes(q.toLowerCase()) ||
+        String(o.orderNo).includes(q),
+    );
 
   const setFilter = (f: FilterKey) => setParams({ sale: sale.id, filter: f }, { replace: true });
 
@@ -103,6 +110,11 @@ function OrderCard({ order }: { order: OrderData }) {
             <span dir="ltr">{order.customer.phone}</span> · {formatShortDateTime(order.createdAt)} ·{' '}
             {order.paymentMethod === 'paybox' ? 'PayBox' : 'תשלום באיסוף'}
           </p>
+          {order.customer.email && (
+            <p className="text-xs text-muted" dir="ltr">
+              {order.customer.email}
+            </p>
+          )}
         </div>
         <span className="text-lg font-bold">{formatPrice(order.total)}</span>
       </div>
