@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { Addon, Product } from '@shared/types';
+import ImageCropper from '../components/ImageCropper';
 import { Button, Card, Field, Loading, ProductImage, inputClass } from '../components/ui';
 import { api } from '../data';
 
@@ -27,6 +28,7 @@ export default function ProductEditor() {
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [typingCategory, setTypingCategory] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -54,12 +56,26 @@ export default function ProductEditor() {
   const setAddon = (i: number, patch: Partial<Addon>) =>
     set('addons', product.addons.map((a, idx) => (idx === i ? { ...a, ...patch } : a)));
 
-  async function upload(file: File | undefined) {
+  // Picking a photo opens the crop step first; the cropped square is what gets uploaded.
+  function pick(file: File | undefined) {
     if (!file) return;
+    setError('');
+    setCropSrc(URL.createObjectURL(file));
+  }
+
+  function closeCropper() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+  }
+
+  async function upload(file: File) {
     setUploading(true);
     try {
-      set('imageUrl', await api.uploadImage(file));
+      const url = await api.uploadImage(file);
+      setProduct((p) => (p ? { ...p, imageUrl: url } : p));
+      closeCropper();
     } catch (err) {
+      closeCropper();
       setError(err instanceof Error ? err.message : 'שגיאה בהעלאת התמונה');
     } finally {
       setUploading(false);
@@ -74,7 +90,20 @@ export default function ProductEditor() {
     if (!category) return setError('נא לבחור או להוסיף קטגוריה');
     const sort = isNew ? Math.max(0, ...catalog.map((p) => p.sort)) + 1 : product!.sort;
     await api.saveProduct({ ...product!, category, sort });
+    if (!isNew) await syncImageToSales(product!.id, product!.imageUrl);
     navigate('/admin/products');
+  }
+
+  // Events keep their own copy of each product; the photo should follow the catalog.
+  async function syncImageToSales(productId: string, imageUrl: string) {
+    const sales = await api.listSales();
+    for (const sale of sales) {
+      if (!sale.items.some((i) => i.productId === productId && i.imageUrl !== imageUrl)) continue;
+      await api.saveSale({
+        ...sale,
+        items: sale.items.map((i) => (i.productId === productId ? { ...i, imageUrl } : i)),
+      });
+    }
   }
 
   async function remove() {
@@ -85,6 +114,7 @@ export default function ProductEditor() {
 
   return (
     <div className="space-y-4">
+      {cropSrc && <ImageCropper src={cropSrc} onCancel={closeCropper} onDone={upload} />}
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl">{isNew ? 'מוצר חדש' : 'עריכת מוצר'}</h1>
         <Link to="/admin/products" className="text-sm underline">
@@ -98,7 +128,15 @@ export default function ProductEditor() {
           <div className="space-y-2">
             <label className="inline-block cursor-pointer rounded-full bg-primary px-4 py-2 text-sm font-semibold text-on-primary">
               {uploading ? 'מעלה…' : product.imageUrl ? 'החלפת תמונה' : 'העלאת תמונה'}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => upload(e.target.files?.[0])} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  pick(e.target.files?.[0]);
+                  e.target.value = ''; // so picking the same photo again still opens the cropper
+                }}
+              />
             </label>
             {product.imageUrl && (
               <button type="button" className="block text-sm underline" onClick={() => set('imageUrl', '')}>
