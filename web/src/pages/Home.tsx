@@ -4,6 +4,7 @@ import SaleCountdown from '../components/SaleCountdown';
 import { buttonClass } from '../components/ui';
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
+import ClosedNotice from '../components/ClosedNotice';
 import { formatDateTime, whatsappLink } from '../lib/format';
 import { useReveal } from '../lib/useReveal';
 
@@ -98,8 +99,7 @@ export default function Home() {
         ) : (
           !loading && (
             <div className="rounded-3xl bg-surface p-6 text-center ring-1 ring-line">
-              <h2 className="font-display text-2xl">אין כרגע הזמנות פתוחות</h2>
-              <p className="mt-2 text-muted">האירוע הבא ייפתח בקרוב – שלחו הודעה כדי לשמוע עליה ראשונים 💕</p>
+              <ClosedNotice heading="h2" />
             </div>
           )
         )}

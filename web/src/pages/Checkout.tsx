@@ -6,6 +6,7 @@ import { cartSummary, useCart } from '../cart/cart';
 import { Button, Card, Field, Loading, buttonClass, inputClass } from '../components/ui';
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
+import ClosedNotice from '../components/ClosedNotice';
 import { formatDateTime, formatPrice } from '../lib/format';
 import { loadCustomer, saveCustomer, saveLastOrder } from '../lib/lastOrder';
 
@@ -35,7 +36,7 @@ export default function Checkout() {
   if (!sale || !summary || summary.count === 0) {
     return (
       <div className="py-16 text-center">
-        <h1 className="font-display text-2xl">{sale ? 'הסל ריק' : 'אין כרגע הזמנות פתוחות'}</h1>
+        {sale ? <h1 className="font-display text-2xl">הסל ריק</h1> : <ClosedNotice />}
         <Link to={sale ? '/order' : '/'} className={buttonClass('primary', 'mt-6')}>
           {sale ? 'לתפריט' : 'לדף הבית'}
         </Link>

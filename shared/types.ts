@@ -94,6 +94,9 @@ export interface SiteSettings {
   theme: string;
   /** Terms page text ("# heading" lines, blank line = new paragraph). Empty = built-in draft. */
   terms: string;
+  /** Heading and text customers see when no event is open. */
+  closedTitle: string;
+  closedText: string;
 }
 
 /** Payload sent by the client to the createOrder function. Prices are recomputed on the server. */

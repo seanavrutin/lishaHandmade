@@ -82,6 +82,8 @@ export const seedSettings: SiteSettings = {
   instagram: '',
   theme: 'cocoa',
   terms: '',
+  closedTitle: 'ההזמנות נסגרו',
+  closedText: 'הזמנות למכירה הבאה ייפתחו ביום ראשון',
 };
 
 /** Next occurrence of `weekday` (0 = Sunday) at `hour`:00 local time, strictly in the future. */

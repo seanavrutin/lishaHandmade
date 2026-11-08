@@ -69,6 +69,19 @@ export default function Settings() {
       </Card>
 
       <Card className="space-y-3">
+        <h2 className="font-semibold">הודעה כשאין הזמנות פתוחות</h2>
+        <Field label="כותרת">
+          <input className={inputClass} value={settings.closedTitle} onChange={(e) => set('closedTitle', e.target.value)} />
+        </Field>
+        <Field label="טקסט">
+          <textarea className={inputClass} rows={2} value={settings.closedText} onChange={(e) => set('closedText', e.target.value)} />
+        </Field>
+        <Button onClick={save} className="w-full py-3">
+          {saved ? '✓ נשמר' : 'שמירה'}
+        </Button>
+      </Card>
+
+      <Card className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">תקנון</h2>
           <Link to="/terms" target="_blank" className="text-sm underline">

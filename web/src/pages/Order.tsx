@@ -5,6 +5,7 @@ import SaleCountdown from '../components/SaleCountdown';
 import { Card, Loading, buttonClass } from '../components/ui';
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
+import ClosedNotice from '../components/ClosedNotice';
 import { formatDateTime, formatPrice } from '../lib/format';
 
 export default function Order() {
@@ -16,8 +17,7 @@ export default function Order() {
   if (!sale) {
     return (
       <div className="py-16 text-center">
-        <h1 className="font-display text-2xl">אין כרגע הזמנות פתוחות</h1>
-        <p className="mt-2 text-muted">האירוע הבא ייפתח בקרוב 💕</p>
+        <ClosedNotice />
         <Link to="/" className={buttonClass('secondary', 'mt-6')}>
           חזרה לדף הבית
         </Link>
