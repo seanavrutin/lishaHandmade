@@ -1,3 +1,4 @@
+import { pickupSummary } from '@shared/pickup';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { isValidEmail, isValidIsraeliMobile } from '@shared/orderLogic';
@@ -7,7 +8,7 @@ import { Button, Card, Field, Loading, buttonClass, inputClass } from '../compon
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
 import ClosedNotice from '../components/ClosedNotice';
-import { formatDateTime, formatPrice } from '../lib/format';
+import { formatPrice } from '../lib/format';
 import { loadCustomer, saveCustomer, saveLastOrder } from '../lib/lastOrder';
 
 const PAYMENT_LABELS: Record<PaymentMethod, { title: string; text: string }> = {
@@ -76,6 +77,8 @@ export default function Checkout() {
         items: summary.rows.map((r) => ({ name: r.name, addonNames: r.addonNames, qty: r.qty, lineTotal: r.lineTotal })),
         saleTitle: sale.title,
         pickupAt: sale.pickupAt,
+        pickupFrom: sale.pickupFrom,
+        pickupUntil: sale.pickupUntil,
         pickupText: sale.pickupText,
         location: sale.location,
       });
@@ -114,7 +117,7 @@ export default function Checkout() {
           <span>{formatPrice(summary.total)}</span>
         </div>
         <p className="mt-3 rounded-xl bg-line/50 p-2.5 text-sm">
-          🧺 איסוף: <strong>{sale.pickupText}</strong> ({formatDateTime(sale.pickupAt)})
+          🧺 איסוף עצמי: <strong>{pickupSummary(sale.pickupAt, sale.pickupText)}</strong>
           {sale.location && <> · {sale.location}</>}
         </p>
       </Card>

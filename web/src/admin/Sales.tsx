@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router';
 import { Card, Loading, buttonClass } from '../components/ui';
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
-import { formatShortDateTime } from '../lib/format';
+import { formatShortDate, formatShortDateTime } from '../lib/format';
 import { SALE_STATUS, duplicateSale, saleState } from './saleUtils';
 
 export default function Sales() {
@@ -38,7 +38,7 @@ export default function Sales() {
                   <div>
                     <p className="font-semibold">{s.title}</p>
                     <p className="text-xs text-muted">
-                      נסגר {formatShortDateTime(s.closesAt)} · איסוף {formatShortDateTime(s.pickupAt)} · {s.orderCount} הזמנות
+                      נסגר {formatShortDateTime(s.closesAt)} · איסוף {formatShortDate(s.pickupAt)} · {s.orderCount} הזמנות
                     </p>
                   </div>
                   <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${SALE_STATUS[state].className}`}>

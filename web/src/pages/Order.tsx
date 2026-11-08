@@ -1,3 +1,4 @@
+import { pickupSummary } from '@shared/pickup';
 import { Link } from 'react-router';
 import { cartSummary, useCart } from '../cart/cart';
 import ProductPicker from '../components/ProductPicker';
@@ -36,7 +37,7 @@ export default function Order() {
         <p className="text-sm">
           הזמנות אחרונות עד <strong>{formatDateTime(sale.closesAt)}</strong>
           <br />
-          איסוף: <strong>{sale.pickupText}</strong>
+          איסוף עצמי: <strong>{pickupSummary(sale.pickupAt, sale.pickupText)}</strong>
           {sale.location && <> · {sale.location}</>}
         </p>
       </Card>

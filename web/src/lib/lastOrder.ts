@@ -11,6 +11,8 @@ export interface LastOrder {
   items: Pick<OrderItem, 'name' | 'addonNames' | 'qty' | 'lineTotal'>[];
   saleTitle: string;
   pickupAt: number;
+  pickupFrom?: string;
+  pickupUntil?: string;
   pickupText: string;
   location: string;
 }

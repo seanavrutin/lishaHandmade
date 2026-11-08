@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router';
+import { pickupSummary } from '@shared/pickup';
 import type { SaleStatus } from '@shared/types';
 import { api, type SaleData } from '../data';
 import { useApiData } from '../data/hooks';
@@ -34,7 +35,7 @@ export function useSelectedSale() {
 /** WhatsApp text Lior sends to customers when opening a sale. */
 export function shareText(sale: SaleData) {
   const url = `${window.location.origin}/order`;
-  return `${sale.message}\n\nהזמנות אחרונות עד *${formatDateTime(sale.closesAt)}*\nאיסוף: ${sale.pickupText}\n\nלהזמנה 👇\n${url}`;
+  return `${sale.message}\n\nהזמנות אחרונות עד *${formatDateTime(sale.closesAt)}*\nאיסוף עצמי: ${pickupSummary(sale.pickupAt, sale.pickupText)}\n\nלהזמנה 👇\n${url}`;
 }
 
 const WEEK = 7 * 24 * 60 * 60 * 1000;

@@ -1,3 +1,4 @@
+import { pickupSummary } from '@shared/pickup';
 import { Link } from 'react-router';
 import { WhatsAppIcon } from '../components/Layout';
 import { Button, Card, Loading, buttonClass } from '../components/ui';
@@ -51,7 +52,7 @@ export default function Dashboard() {
             <>מועד סגירה: {formatDateTime(sale.closesAt)}</>
           )}
           <br />
-          איסוף: {sale.pickupText} · {formatDateTime(sale.pickupAt)}
+          איסוף עצמי: {pickupSummary(sale.pickupAt, sale.pickupText)}
         </p>
         <div className="flex flex-wrap gap-2 pt-1">
           {state === 'open' && (
@@ -90,7 +91,7 @@ export default function Dashboard() {
           </Button>
         </div>
         <p className="mb-2 hidden text-sm print:block">
-          {sale.title} · איסוף {formatDateTime(sale.pickupAt)}
+          {sale.title} · איסוף עצמי: {pickupSummary(sale.pickupAt, sale.pickupText)}
         </p>
         {production.length === 0 ? (
           <p className="text-muted">עוד אין הזמנות.</p>

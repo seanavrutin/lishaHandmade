@@ -1,3 +1,4 @@
+import { pickupSummary } from '@shared/pickup';
 import { Link } from 'react-router';
 import { WhatsAppIcon } from '../components/Layout';
 import SaleCountdown from '../components/SaleCountdown';
@@ -87,8 +88,8 @@ export default function Home() {
                   <dd className="mt-0.5 font-semibold">{formatDateTime(sale.closesAt)}</dd>
                 </div>
                 <div className="rounded-2xl bg-page p-3">
-                  <dt className="text-muted">איסוף</dt>
-                  <dd className="mt-0.5 font-semibold">{sale.pickupText}</dd>
+                  <dt className="text-muted">איסוף עצמי</dt>
+                  <dd className="mt-0.5 font-semibold">{pickupSummary(sale.pickupAt, sale.pickupText)}</dd>
                 </div>
               </dl>
               <Link to="/order" className={buttonClass('primary', 'w-full py-4 text-lg shadow-md sm:w-auto sm:px-16')}>

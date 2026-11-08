@@ -1,4 +1,3 @@
-import { Card } from '../components/ui';
 import { THEMES, type ThemeName } from '../lib/theme';
 
 /**
@@ -7,11 +6,8 @@ import { THEMES, type ThemeName } from '../lib/theme';
  */
 export default function ThemePicker({ value, onChange }: { value: string; onChange: (theme: ThemeName) => void }) {
   return (
-    <Card className="space-y-3">
-      <div>
-        <h2 className="font-semibold">עיצוב האתר</h2>
-        <p className="text-xs text-muted">לחיצה מחליפה את העיצוב מיד, לכל המבקרים באתר.</p>
-      </div>
+    <>
+      <p className="text-xs text-muted">לחיצה מחליפה את העיצוב מיד, לכל המבקרים באתר.</p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {(Object.keys(THEMES) as ThemeName[]).map((name) => {
           const selected = value === name;
@@ -45,6 +41,6 @@ export default function ThemePicker({ value, onChange }: { value: string; onChan
           );
         })}
       </div>
-    </Card>
+    </>
   );
 }

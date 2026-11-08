@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
+import { PICKUP_TBD, pickupHours, pickupSummary } from '@shared/pickup';
 import type { PaymentMethod, SaleItem, SaleStatus } from '@shared/types';
 import { WhatsAppIcon } from '../components/Layout';
 import { Button, Card, Field, Loading, ProductImage, buttonClass, inputClass } from '../components/ui';
@@ -19,7 +20,9 @@ function emptySale(): SaleData {
     opensAt: Date.now(),
     closesAt,
     pickupAt: nextWeekday(5, 12, new Date(closesAt)),
-    pickupText: 'שישי בצהריים',
+    pickupFrom: '',
+    pickupUntil: '',
+    pickupText: PICKUP_TBD,
     location: '',
     status: 'draft',
     paymentModes: ['paybox', 'pickup'],
@@ -104,6 +107,9 @@ export default function SaleEditor() {
 
   const set = <K extends keyof SaleData>(key: K, value: SaleData[K]) => setSale({ ...sale, [key]: value });
   const setDraft = (pid: string, patch: Partial<ItemDraft>) => setDrafts({ ...drafts, [pid]: { ...drafts[pid], ...patch } });
+  // The customer-facing text changes only when an hour is touched, so older events keep their wording until edited.
+  const setPickupHours = (from: string, until: string) =>
+    setSale({ ...sale, pickupFrom: from, pickupUntil: until, pickupText: pickupHours(from, until) });
 
   // Every catalog product, in the dragged order.
   const visibleIds = order.filter((pid) => products.some((x) => x.id === pid));
@@ -131,6 +137,9 @@ export default function SaleEditor() {
     if (!sale!.title.trim()) return setError('נא למלא כותרת');
     if (items.length === 0) return setError('יש לבחור לפחות מוצר אחד');
     if (sale!.closesAt <= sale!.opensAt) return setError('מועד הסגירה חייב להיות אחרי מועד הפתיחה');
+    if (sale!.pickupFrom && sale!.pickupUntil && sale!.pickupFrom >= sale!.pickupUntil) {
+      return setError('שעת סיום האיסוף חייבת להיות אחרי שעת ההתחלה');
+    }
     if (sale!.paymentModes.length === 0) return setError('יש לבחור לפחות אמצעי תשלום אחד');
 
     setSaving(true);
@@ -155,7 +164,7 @@ export default function SaleEditor() {
     navigate('/admin/events');
   }
 
-  const dateField = (label: string, key: 'opensAt' | 'closesAt' | 'pickupAt') => (
+  const dateField = (label: string, key: 'opensAt' | 'closesAt') => (
     <Field label={label}>
       <input
         type="datetime-local"
@@ -208,13 +217,49 @@ export default function SaleEditor() {
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="font-semibold">מועדים</h2>
+        <h2 className="font-semibold">מועדי הזמנה</h2>
         {dateField('פתיחת הזמנות', 'opensAt')}
         {dateField('הזמנות אחרונות עד', 'closesAt')}
-        {dateField('מועד איסוף', 'pickupAt')}
-        <Field label="תיאור האיסוף" hint='למשל: "שישי בצהריים, 12:00–14:00"'>
-          <input className={inputClass} value={sale.pickupText} onChange={(e) => set('pickupText', e.target.value)} />
+      </Card>
+
+      <Card className="space-y-3">
+        <h2 className="font-semibold">איסוף עצמי</h2>
+        <Field label="תאריך איסוף">
+          <input
+            type="date"
+            className={inputClass}
+            value={toDateTimeInput(sale.pickupAt).slice(0, 10)}
+            onChange={(e) => e.target.value && set('pickupAt', fromDateTimeInput(`${e.target.value}T12:00`))}
+          />
         </Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="משעה (לא חובה)">
+            <input
+              type="time"
+              dir="ltr"
+              className={inputClass}
+              value={sale.pickupFrom ?? ''}
+              onChange={(e) => setPickupHours(e.target.value, sale.pickupUntil ?? '')}
+            />
+          </Field>
+          <Field label="עד שעה">
+            <input
+              type="time"
+              dir="ltr"
+              className={inputClass}
+              value={sale.pickupUntil ?? ''}
+              onChange={(e) => setPickupHours(sale.pickupFrom ?? '', e.target.value)}
+            />
+          </Field>
+        </div>
+        <p className="rounded-xl bg-line/50 p-2.5 text-sm">
+          יוצג ללקוחות: <strong>איסוף עצמי: {pickupSummary(sale.pickupAt, sale.pickupText)}</strong>
+        </p>
+        {(sale.pickupFrom || sale.pickupUntil) && (
+          <button type="button" className="text-sm underline" onClick={() => setPickupHours('', '')}>
+            השעה עוד לא נקבעה – ניקוי השעות
+          </button>
+        )}
         <Field label="מקום האיסוף">
           <input className={inputClass} value={sale.location} onChange={(e) => set('location', e.target.value)} />
         </Field>

@@ -30,6 +30,10 @@ export const formatShortDateTime = (ms: number) =>
     minute: '2-digit',
   }).format(ms);
 
+/** → "5.11" */
+export const formatShortDate = (ms: number) =>
+  new Intl.DateTimeFormat('he-IL', { timeZone: TZ, day: 'numeric', month: 'numeric' }).format(ms);
+
 /** Remaining time in Hebrew: "יומיים ו־3 שעות", "4 שעות ו־12 דקות", "12 דקות". */
 export function formatTimeLeft(ms: number): string {
   if (ms <= 0) return 'נסגר';

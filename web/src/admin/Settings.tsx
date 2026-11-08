@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import type { SiteSettings } from '@shared/types';
-import { Button, Card, Field, Loading, inputClass } from '../components/ui';
+import { Button, Field, Loading, inputClass } from '../components/ui';
 import { api } from '../data';
 import { DEFAULT_TERMS } from '../lib/terms';
 import { applySiteTheme, type ThemeName } from '../lib/theme';
+import SettingsSection from './SettingsSection';
 import ThemePicker from './ThemePicker';
 
 export default function Settings() {
@@ -45,9 +46,11 @@ export default function Settings() {
     <div className="space-y-4">
       <h1 className="font-display text-2xl">הגדרות האתר</h1>
 
-      <ThemePicker value={settings.theme} onChange={chooseTheme} />
+      <SettingsSection title="עיצוב האתר">
+        <ThemePicker value={settings.theme} onChange={chooseTheme} />
+      </SettingsSection>
 
-      <Card className="space-y-3">
+      <SettingsSection title="פרטי העסק">
         <Field label="טקסט ״קצת עליי״">
           <textarea className={inputClass} rows={6} value={settings.aboutText} onChange={(e) => set('aboutText', e.target.value)} />
         </Field>
@@ -66,10 +69,9 @@ export default function Settings() {
         <Button onClick={save} className="w-full py-3">
           {saved ? '✓ נשמר' : 'שמירה'}
         </Button>
-      </Card>
+      </SettingsSection>
 
-      <Card className="space-y-3">
-        <h2 className="font-semibold">הודעה כשאין הזמנות פתוחות</h2>
+      <SettingsSection title="הודעה כשאין הזמנות פתוחות">
         <Field label="כותרת">
           <input className={inputClass} value={settings.closedTitle} onChange={(e) => set('closedTitle', e.target.value)} />
         </Field>
@@ -79,15 +81,12 @@ export default function Settings() {
         <Button onClick={save} className="w-full py-3">
           {saved ? '✓ נשמר' : 'שמירה'}
         </Button>
-      </Card>
+      </SettingsSection>
 
-      <Card className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold">תקנון</h2>
-          <Link to="/terms" target="_blank" className="text-sm underline">
-            צפייה בתקנון
-          </Link>
-        </div>
+      <SettingsSection title="תקנון">
+        <Link to="/terms" target="_blank" className="block text-sm underline">
+          צפייה בתקנון
+        </Link>
         <Field label="טקסט התקנון" hint="שורה שמתחילה ב-# היא כותרת. שורה ריקה מתחילה פסקה חדשה.">
           <textarea
             className={`${inputClass} leading-relaxed`}
@@ -99,16 +98,15 @@ export default function Settings() {
         <Button onClick={save} className="w-full py-3">
           {saved ? '✓ נשמר' : 'שמירת התקנון'}
         </Button>
-      </Card>
+      </SettingsSection>
 
       {api.isDemo && (
-        <Card className="space-y-2">
-          <h2 className="font-semibold">מצב הדגמה</h2>
+        <SettingsSection title="מצב הדגמה">
           <p className="text-sm text-muted">הנתונים נשמרים רק בדפדפן הזה. אפשר לאפס אותם לנתוני הדוגמה.</p>
           <Button variant="danger" onClick={reset}>
             איפוס נתוני הדגמה
           </Button>
-        </Card>
+        </SettingsSection>
       )}
     </div>
   );

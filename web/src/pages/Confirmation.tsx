@@ -1,20 +1,36 @@
+import { pickupSummary } from '@shared/pickup';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { WhatsAppIcon } from '../components/Layout';
 import { Card, buttonClass } from '../components/ui';
 import { api } from '../data';
 import { useApiData } from '../data/hooks';
-import { formatDateTime, formatPrice, whatsappLink } from '../lib/format';
-import { loadLastOrder } from '../lib/lastOrder';
+import { formatPrice, whatsappLink } from '../lib/format';
+import { loadLastOrder, type LastOrder } from '../lib/lastOrder';
 
-/** Google Calendar "add event" link for the pickup (1 hour). */
-function calendarLink(title: string, start: number, location: string) {
-  const fmt = (ms: number) => new Date(ms).toISOString().replace(/[-:]|\.\d{3}/g, '');
+const TZ = 'Asia/Jerusalem';
+const DAY = 24 * 60 * 60 * 1000;
+
+/** Google Calendar `dates` value: the pickup hours (1 hour if only one is set), or all day when no hours are set. */
+function calendarDates({ pickupAt, pickupFrom, pickupUntil }: LastOrder) {
+  const day = (ms: number) => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(ms).replace(/-/g, '');
+  if (!pickupFrom && !pickupUntil) return `${day(pickupAt)}/${day(pickupAt + DAY)}`;
+
+  const minutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+  const start = pickupFrom ? minutes(pickupFrom) : Math.max(0, minutes(pickupUntil!) - 60);
+  const end = pickupUntil ? minutes(pickupUntil) : Math.min(23 * 60 + 59, minutes(pickupFrom!) + 60);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const stamp = (m: number) => `${day(pickupAt)}T${pad(Math.floor(m / 60))}${pad(m % 60)}00`;
+  return `${stamp(start)}/${stamp(end)}`;
+}
+
+function calendarLink(title: string, order: LastOrder) {
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: title,
-    dates: `${fmt(start)}/${fmt(start + 60 * 60 * 1000)}`,
-    location,
+    dates: calendarDates(order),
+    ctz: TZ,
+    location: order.location,
   });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
@@ -116,16 +132,17 @@ export default function Confirmation() {
 
       <Card className="space-y-3">
         <p>
-          🧺 איסוף: <strong>{order.pickupText}</strong>
-          <br />
-          <span className="text-sm text-muted">
-            {formatDateTime(order.pickupAt)}
-            {order.location && ` · ${order.location}`}
-          </span>
+          🧺 איסוף עצמי: <strong>{pickupSummary(order.pickupAt, order.pickupText)}</strong>
+          {order.location && (
+            <>
+              <br />
+              <span className="text-sm text-muted">{order.location}</span>
+            </>
+          )}
         </p>
         <div className="flex flex-wrap gap-2">
           <a
-            href={calendarLink(`איסוף הזמנה #${order.orderNo} – Lisha Handmade`, order.pickupAt, order.location)}
+            href={calendarLink(`איסוף הזמנה #${order.orderNo} – Lisha Handmade`, order)}
             target="_blank"
             rel="noreferrer"
             className={buttonClass('secondary', 'text-sm')}

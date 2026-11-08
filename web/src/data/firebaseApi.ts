@@ -60,6 +60,8 @@ function saleFields(s: SaleData) {
     opensAt: Timestamp.fromMillis(s.opensAt),
     closesAt: Timestamp.fromMillis(s.closesAt),
     pickupAt: Timestamp.fromMillis(s.pickupAt),
+    pickupFrom: s.pickupFrom ?? '',
+    pickupUntil: s.pickupUntil ?? '',
     pickupText: s.pickupText,
     location: s.location,
     status: s.status,

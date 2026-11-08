@@ -48,7 +48,12 @@ export interface Sale<T = unknown> {
   message: string;
   opensAt: T;
   closesAt: T;
+  /** Pickup date (noon, unless the event was saved before the hours became separate fields). */
   pickupAt: T;
+  /** Pickup hours as "HH:MM"; empty when not set. Both empty = not decided yet. */
+  pickupFrom?: string;
+  pickupUntil?: string;
+  /** The hours as customers read them, built from the two fields above. */
   pickupText: string;
   location: string;
   status: SaleStatus;

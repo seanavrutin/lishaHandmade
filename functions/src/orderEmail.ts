@@ -1,4 +1,5 @@
 // Order-summary email sent to the customer after a website order, through the business Gmail.
+import { pickupSummary } from '../../shared/pickup';
 import type { OrderItem, PaymentMethod } from '../../shared/types';
 
 export const SENDER = 'lisha.handmade@gmail.com';
@@ -20,15 +21,6 @@ export interface OrderEmail {
 
 const ils = (n: number) => `${n.toLocaleString('he-IL')} ₪`;
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-const when = (ms: number) =>
-  new Intl.DateTimeFormat('he-IL', {
-    timeZone: 'Asia/Jerusalem',
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(ms);
 
 export function buildEmail(o: OrderEmail) {
   const firstName = o.name.split(' ')[0];
@@ -62,7 +54,7 @@ export function buildEmail(o: OrderEmail) {
       <tr><td style="padding:8px 0;border-top:1px solid #efe2d3;font-weight:bold">סה״כ</td><td style="padding:8px 0;border-top:1px solid #efe2d3;text-align:left;font-weight:bold">${ils(o.total)}</td></tr>
     </table>
     <div style="background:#f7efe6;border-radius:12px;padding:12px;margin:16px 0">${payment}</div>
-    <p style="margin:0"><strong>🧺 איסוף:</strong> ${esc(o.pickupText)}<br><span style="color:#8a6656">${when(o.pickupAt)}${o.location ? ` · ${esc(o.location)}` : ''}</span></p>
+    <p style="margin:0"><strong>🧺 איסוף עצמי:</strong> ${esc(pickupSummary(o.pickupAt, o.pickupText))}${o.location ? `<br><span style="color:#8a6656">${esc(o.location)}</span>` : ''}</p>
   </div>
   <p style="text-align:center;color:#8a6656;font-size:13px;margin-top:16px">לשאלות: ליאור · ${esc(o.phone)}<br>Lisha Handmade</p>
 </div></body></html>`;
@@ -75,7 +67,7 @@ export function buildEmail(o: OrderEmail) {
     o.paymentMethod === 'paybox'
       ? `תשלום ב-PayBox${o.payboxLink ? `: ${o.payboxLink}` : ''} (נא לציין: הזמנה #${o.orderNo}), או בביט ל-${o.phone}`
       : 'תשלום באיסוף – במזומן או בביט',
-    `איסוף: ${o.pickupText} – ${when(o.pickupAt)}${o.location ? ` · ${o.location}` : ''}`,
+    `איסוף עצמי: ${pickupSummary(o.pickupAt, o.pickupText)}${o.location ? ` · ${o.location}` : ''}`,
     `לשאלות: ליאור · ${o.phone}`,
   ].join('\n');
 
