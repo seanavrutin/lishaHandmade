@@ -4,6 +4,7 @@ import DemoBanner from '../components/DemoBanner';
 import { Button } from '../components/ui';
 import { api } from '../data';
 import { useAdmin, useSignedInEmail } from '../data/hooks';
+import { useTyping } from '../lib/useTyping';
 import Dashboard from './Dashboard';
 import ManualOrder from './ManualOrder';
 import Orders from './Orders';
@@ -25,6 +26,7 @@ export default function AdminApp() {
   const admin = useAdmin();
   const signedInEmail = useSignedInEmail();
   const [signInError, setSignInError] = useState('');
+  const typing = useTyping();
 
   const signIn = async () => {
     setSignInError('');
@@ -96,7 +98,11 @@ export default function AdminApp() {
         </Routes>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur print:hidden">
+      <nav
+        className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur print:hidden ${
+          typing ? 'hidden' : ''
+        }`}
+      >
         <ul className="mx-auto flex max-w-3xl">
           {TABS.map((t) => (
             <li key={t.to} className="flex-1">
