@@ -14,7 +14,7 @@ export default function Sales() {
   async function duplicate(id: string) {
     const source = sales?.find((s) => s.id === id);
     if (!source) return;
-    const copy = await api.saveSale(duplicateSale(source));
+    const copy = await api.saveSale(duplicateSale(source, await api.listProducts()));
     navigate(`/admin/events/${copy.id}`);
   }
 
@@ -26,7 +26,7 @@ export default function Sales() {
           + אירוע חדש
         </Link>
       </div>
-      <p className="text-sm text-muted">טיפ: ״שכפול״ יוצר את אותו אירוע לשבוע הבא, עם כל התאריכים מוזזים בשבוע.</p>
+      <p className="text-sm text-muted">טיפ: ״שכפול״ יוצר את אותו אירוע לשבוע הבא, עם כל התאריכים מוזזים בשבוע והמחירים העדכניים מרשימת המוצרים.</p>
 
       <ul className="space-y-3">
         {(sales ?? []).map((s) => {

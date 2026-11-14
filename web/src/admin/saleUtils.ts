@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router';
 import { pickupSummary } from '@shared/pickup';
-import type { SaleStatus } from '@shared/types';
+import type { Product, SaleStatus } from '@shared/types';
 import { api, type SaleData } from '../data';
 import { useApiData } from '../data/hooks';
 import { formatDateTime } from '../lib/format';
@@ -40,12 +40,23 @@ export function shareText(sale: SaleData) {
 
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 
-/** Copy of a sale as a new draft, moved forward by whole weeks until its deadline is in the future. */
-export function duplicateSale(sale: SaleData, now = Date.now()): SaleData {
+/**
+ * Copy of a sale as a new draft, moved forward by whole weeks until its deadline is in the future.
+ * Like a new event, it takes each product's current catalog details and price; quantity limits,
+ * specials and the product order are copied from the source.
+ */
+export function duplicateSale(sale: SaleData, products: Product[], now = Date.now()): SaleData {
   let shift = WEEK;
   while (sale.closesAt + shift <= now) shift += WEEK;
+  const items = sale.items.map((item) => {
+    const p = products.find((x) => x.id === item.productId);
+    return p
+      ? { ...item, name: p.name, description: p.description, imageUrl: p.imageUrl, category: p.category, price: p.basePrice, addons: p.addons }
+      : item;
+  });
   return {
     ...sale,
+    items,
     id: '',
     status: 'draft',
     opensAt: Math.max(sale.opensAt + shift, now),
