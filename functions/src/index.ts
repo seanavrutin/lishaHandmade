@@ -5,7 +5,7 @@ import { setGlobalOptions, logger } from 'firebase-functions/v2';
 import { defineSecret } from 'firebase-functions/params';
 import { assertSaleOpen, normalizeOrderRequest, OrderError, priceOrder } from '../../shared/orderLogic';
 import type { CreateOrderRequest, CreateOrderResponse, Order, Sale, SiteSettings } from '../../shared/types';
-import { sendOrderEmail } from './orderEmail';
+import { sendOrderEmail, sendOwnerEmail } from './orderEmail';
 
 initializeApp();
 setGlobalOptions({ region: 'europe-west1', maxInstances: 5 });
@@ -22,11 +22,20 @@ async function isAdmin(token: { email?: string; email_verified?: boolean } | und
   return (await db.collection('admins').doc(token.email.toLowerCase()).get()).exists;
 }
 
+/** A failed email is logged and never fails the order. */
+async function tryEmail(label: string, orderNo: number, send: () => Promise<unknown>) {
+  try {
+    await send();
+  } catch (err) {
+    logger.error(`${label} failed`, { orderNo, error: String(err) });
+  }
+}
+
 /**
  * Creates an order inside one transaction: checks the sale is open, recomputes prices from the
  * sale document (client prices are never trusted), enforces stock limits and assigns an order number.
  * `manual: true` (admins only) is for phone orders: allowed after closing and without stock limits.
- * Afterwards the customer gets an order-summary email; a failed email never fails the order.
+ * Afterwards the customer gets an order-summary email and, for website orders, Lior gets an alert.
  */
 export const createOrder = onCall<CreateOrderRequest & { manual?: boolean }>({ secrets: [gmailAppPassword] }, async (request): Promise<CreateOrderResponse> => {
   try {
@@ -75,30 +84,31 @@ export const createOrder = onCall<CreateOrderRequest & { manual?: boolean }>({ s
       return { response: { orderId: orderRef.id, orderNo, total }, sale, items, total };
     });
 
-    if (input.customer.email) {
-      try {
-        const settings = (await db.collection('settings').doc('site').get()).data() as Partial<SiteSettings> | undefined;
-        await sendOrderEmail(
-          {
-            to: input.customer.email,
-            name: input.customer.name,
-            orderNo: response.orderNo,
-            items,
-            total,
-            paymentMethod: input.paymentMethod,
-            saleTitle: sale.title,
-            pickupAt: sale.pickupAt.toMillis(),
-            pickupText: sale.pickupText,
-            location: sale.location,
-            payboxLink: settings?.payboxLink ?? '',
-            phone: settings?.phone ?? '',
-          },
-          gmailAppPassword.value(),
-        );
-      } catch (err) {
-        logger.error('Order email failed', { orderNo: response.orderNo, error: String(err) });
-      }
-    }
+    const { orderNo } = response;
+    const details = {
+      orderNo,
+      items,
+      total,
+      paymentMethod: input.paymentMethod,
+      saleTitle: sale.title,
+      pickupAt: sale.pickupAt.toMillis(),
+      pickupText: sale.pickupText,
+      location: sale.location,
+    };
+    const password = gmailAppPassword.value();
+    const { email } = input.customer;
+
+    await Promise.all([
+      email &&
+        tryEmail('Order email', orderNo, async () => {
+          const settings = (await db.collection('settings').doc('site').get()).data() as Partial<SiteSettings> | undefined;
+          await sendOrderEmail(
+            { ...details, to: email, name: input.customer.name, payboxLink: settings?.payboxLink ?? '', phone: settings?.phone ?? '' },
+            password,
+          );
+        }),
+      !manual && tryEmail('Owner email', orderNo, () => sendOwnerEmail({ ...details, customer: input.customer, notes: input.notes }, password)),
+    ]);
 
     return response;
   } catch (err) {
